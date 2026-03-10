@@ -20,7 +20,12 @@ export default function App() {
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
-  const [isAuthed, setIsAuthed] = useState(false)
+  const initialAuthed =
+    import.meta.env.DEV &&
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('authed') === '1'
+
+  const [isAuthed, setIsAuthed] = useState(initialAuthed)
   const [credentials, setCredentials] = useState('')
   const [scope, setScope] = useState<AuthScope>('GIGACHAT_API_PERS')
   const [authError, setAuthError] = useState<string | null>(null)

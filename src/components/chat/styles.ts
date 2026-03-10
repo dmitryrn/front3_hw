@@ -140,6 +140,7 @@ export const Bubble = styled.div<{ $variant: 'user' | 'assistant' }>`
 
 export const Markdown = styled.div<{ $variant: 'user' | 'assistant' }>`
   font-size: 14px;
+  overflow-wrap: anywhere;
 
   p {
     margin: 0 0 8px;
@@ -172,7 +173,8 @@ export const Markdown = styled.div<{ $variant: 'user' | 'assistant' }>`
     padding: 10px 12px;
     border-radius: 14px;
     background: rgba(0, 0, 0, 0.08);
-    overflow: auto;
+    overflow-x: auto;
+    max-width: 100%;
   }
 
   :root[data-theme='dark'] & pre {
@@ -180,6 +182,7 @@ export const Markdown = styled.div<{ $variant: 'user' | 'assistant' }>`
   }
 
   pre code {
+    display: block;
     padding: 0;
     background: transparent;
   }

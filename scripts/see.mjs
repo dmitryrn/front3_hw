@@ -74,7 +74,7 @@ try {
   await mkdir(OUT_DIR, { recursive: true })
 
   const port = await findFreePort(HOST, PORT_START)
-  const url = process.env.SEE_URL ?? `http://${HOST}:${port}/`
+  const url = process.env.SEE_URL ?? `http://${HOST}:${port}/?authed=1`
 
   // When run under `npm run`, PATH prefers ./node_modules/.bin.
   // That is fine, but keep a clear error if PLAYWRIGHT_BIN is mis-set.
