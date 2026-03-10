@@ -13,6 +13,8 @@ type AuthFormProps = {
   onSubmit: () => void
 }
 
+const SCOPES: AuthScope[] = ['GIGACHAT_API_PERS', 'GIGACHAT_API_B2B', 'GIGACHAT_API_CORP']
+
 export default function AuthForm({
   credentials,
   scope,
@@ -47,33 +49,12 @@ export default function AuthForm({
           <div>
             <FieldLabel as="span">Scope</FieldLabel>
             <Radios>
-              <Radio>
-                <input
-                  type="radio"
-                  name="scope"
-                  checked={scope === 'GIGACHAT_API_PERS'}
-                  onChange={() => onScopeChange('GIGACHAT_API_PERS')}
-                />
-                <span>GIGACHAT_API_PERS</span>
-              </Radio>
-              <Radio>
-                <input
-                  type="radio"
-                  name="scope"
-                  checked={scope === 'GIGACHAT_API_B2B'}
-                  onChange={() => onScopeChange('GIGACHAT_API_B2B')}
-                />
-                <span>GIGACHAT_API_B2B</span>
-              </Radio>
-              <Radio>
-                <input
-                  type="radio"
-                  name="scope"
-                  checked={scope === 'GIGACHAT_API_CORP'}
-                  onChange={() => onScopeChange('GIGACHAT_API_CORP')}
-                />
-                <span>GIGACHAT_API_CORP</span>
-              </Radio>
+              {SCOPES.map((v) => (
+                <Radio key={v}>
+                  <input type="radio" name="scope" checked={scope === v} onChange={() => onScopeChange(v)} />
+                  <span>{v}</span>
+                </Radio>
+              ))}
             </Radios>
           </div>
 

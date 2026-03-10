@@ -12,7 +12,7 @@ function copyToClipboard(text: string) {
 }
 
 export default function Message({ message }: MessageProps) {
-  const isUser = message.role === 'user'
+  const isUser = message.variant === 'user'
   const variant = isUser ? 'user' : 'assistant'
 
   return (
