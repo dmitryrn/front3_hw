@@ -12,10 +12,6 @@ dist
 dist-ssr
 *.local
 
-# Local Playwright artifacts
-playwright-artifacts/*
-!playwright-artifacts/.gitkeep
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -1,0 +1,131 @@
+.overlay {
+  display: none;
+}
+
+.sidebar {
+  width: 320px;
+  border-right: 1px solid var(--color-border);
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-2));
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.top {
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.newChat {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.plus {
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.list {
+  padding: 8px;
+  overflow: auto;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 10px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.item:hover {
+  background: rgba(43, 122, 106, 0.08);
+  border-color: rgba(43, 122, 106, 0.18);
+}
+
+.itemActive {
+  background: rgba(43, 122, 106, 0.14);
+  border-color: rgba(43, 122, 106, 0.35);
+}
+
+.title {
+  font-size: 14px;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.actions {
+  display: flex;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.item:hover .actions {
+  opacity: 1;
+}
+
+.actionBtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.actionBtn:hover {
+  border-color: rgba(43, 122, 106, 0.35);
+}
+
+@media (max-width: 800px) {
+  .overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease;
+  }
+
+  .overlayOpen {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-105%);
+    transition: transform 180ms ease;
+    z-index: 30;
+  }
+
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+}
