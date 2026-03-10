@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { mkdir } from 'node:fs/promises'
 import { accessSync, constants as fsConstants } from 'node:fs'
 import net from 'node:net'
@@ -17,7 +17,17 @@ const BROWSER = process.env.SEE_BROWSER ?? 'chromium'
 const DESKTOP_VIEWPORT = process.env.SEE_DESKTOP_VIEWPORT ?? '1280,720'
 const MOBILE_VIEWPORT = process.env.SEE_MOBILE_VIEWPORT ?? '390,844'
 
-const PLAYWRIGHT_BIN = process.env.PLAYWRIGHT_BIN ?? 'playwright'
+const DEFAULT_GLOBAL_PLAYWRIGHT = '/usr/local/bin/playwright'
+const PLAYWRIGHT_BIN =
+  process.env.PLAYWRIGHT_BIN ??
+  (function pickPlaywrightBin() {
+    try {
+      accessSync(DEFAULT_GLOBAL_PLAYWRIGHT, fsConstants.X_OK)
+      return DEFAULT_GLOBAL_PLAYWRIGHT
+    } catch {
+      return 'playwright'
+    }
+  })()
 
 function npmCmd() {
   return process.platform === 'win32' ? 'npm.cmd' : 'npm'
@@ -77,11 +87,17 @@ try {
   const url = process.env.SEE_URL ?? `http://${HOST}:${port}/`
 
   // When run under `npm run`, PATH prefers ./node_modules/.bin.
-  // That is fine, but keep a clear error if PLAYWRIGHT_BIN is mis-set.
+  // Prefer global Playwright by default to share global browser installs.
   try {
     accessSync(PLAYWRIGHT_BIN, fsConstants.X_OK)
   } catch {
     // Ignore: PLAYWRIGHT_BIN might be resolved via PATH.
+  }
+
+  {
+    const ver = spawnSync(PLAYWRIGHT_BIN, ['--version'], { encoding: 'utf8' })
+    const msg = (ver.stdout || ver.stderr || '').trim()
+    console.log(`Using Playwright bin: ${PLAYWRIGHT_BIN}${msg ? ` (${msg})` : ''}`)
   }
 
   devServer = spawnLogged(npmCmd(), [
