@@ -8,6 +8,7 @@ export const Overlay = styled.div<{ $open: boolean }>`
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.35);
+    z-index: 20;
     opacity: ${(p) => (p.$open ? 1 : 0)};
     pointer-events: ${(p) => (p.$open ? 'auto' : 'none')};
     transition: opacity 160ms ease;
