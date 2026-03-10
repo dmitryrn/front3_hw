@@ -1,7 +1,7 @@
 import type { ChatMessage } from '../../types'
 import Message from './Message'
 import TypingIndicator from './TypingIndicator'
-import styles from './Chat.module.css'
+import { Avatar, Bubble, BubbleWrap, Messages, Meta, Row, Stack } from './styles'
 
 type MessageListProps = {
   messages: ChatMessage[]
@@ -10,24 +10,24 @@ type MessageListProps = {
 
 export default function MessageList({ messages, isTypingVisible }: MessageListProps) {
   return (
-    <div className={styles.messages}>
-      <div className={styles.stack}>
+    <Messages>
+      <Stack>
         {messages.map((m) => (
           <Message key={m.id} message={m} />
         ))}
 
         {isTypingVisible ? (
-          <div className={styles.row}>
-            <div className={styles.avatar}>G</div>
-            <div className={styles.bubbleWrap}>
-              <div className={styles.meta}>GigaChat</div>
-              <div className={styles.bubble}>
+          <Row $variant="assistant">
+            <Avatar>G</Avatar>
+            <BubbleWrap>
+              <Meta>GigaChat</Meta>
+              <Bubble $variant="assistant">
                 <TypingIndicator isVisible />
-              </div>
-            </div>
-          </div>
+              </Bubble>
+            </BubbleWrap>
+          </Row>
         ) : null}
-      </div>
-    </div>
+      </Stack>
+    </Messages>
   )
 }

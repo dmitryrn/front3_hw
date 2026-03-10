@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
-import styles from './ui.module.css'
+import { ButtonBase } from './styles'
 
 type ButtonVariant = 'default' | 'primary' | 'ghost'
 
@@ -15,11 +15,5 @@ export default function Button({
   className,
   ...props
 }: ButtonProps) {
-  const variantClass =
-    variant === 'primary' ? styles.btnPrimary : variant === 'ghost' ? styles.btnGhost : undefined
-
-  const iconClass = iconOnly ? styles.btnIcon : undefined
-
-  const cls = [styles.btn, variantClass, iconClass, className].filter(Boolean).join(' ')
-  return <button className={cls} {...props} />
+  return <ButtonBase className={className} $variant={variant} $iconOnly={Boolean(iconOnly)} {...props} />
 }

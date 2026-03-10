@@ -1,6 +1,6 @@
 import type { Chat } from '../../types'
 import ChatItem from './ChatItem'
-import styles from './Sidebar.module.css'
+import { List } from './styles'
 
 type ChatListProps = {
   chats: Chat[]
@@ -18,7 +18,7 @@ export default function ChatList({
   onDeleteChat,
 }: ChatListProps) {
   return (
-    <div className={styles.list} aria-label="Список чатов">
+    <List aria-label="Список чатов">
       {chats.map((c) => (
         <ChatItem
           key={c.id}
@@ -29,6 +29,6 @@ export default function ChatList({
           onDelete={() => onDeleteChat(c.id)}
         />
       ))}
-    </div>
+    </List>
   )
 }

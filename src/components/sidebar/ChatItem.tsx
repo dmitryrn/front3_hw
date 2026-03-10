@@ -1,5 +1,5 @@
 import type { Chat } from '../../types'
-import styles from './Sidebar.module.css'
+import { ActionBtn, Actions, Item, Meta, Title } from './styles'
 
 type ChatItemProps = {
   chat: Chat
@@ -16,11 +16,9 @@ function formatDate(value: string) {
 }
 
 export default function ChatItem({ chat, active, onSelect, onEdit, onDelete }: ChatItemProps) {
-  const cls = [styles.item, active ? styles.itemActive : undefined].filter(Boolean).join(' ')
-
   return (
-    <div
-      className={cls}
+    <Item
+      $active={active}
       role="button"
       tabIndex={0}
       aria-current={active || undefined}
@@ -32,15 +30,14 @@ export default function ChatItem({ chat, active, onSelect, onEdit, onDelete }: C
       }}
     >
       <div style={{ minWidth: 0 }}>
-        <div className={styles.title} title={chat.title}>
+        <Title title={chat.title}>
           {chat.title}
-        </div>
-        <div className={styles.meta}>{formatDate(chat.lastMessageAt)}</div>
+        </Title>
+        <Meta>{formatDate(chat.lastMessageAt)}</Meta>
       </div>
 
-      <div className={styles.actions}>
-        <button
-          className={styles.actionBtn}
+      <Actions>
+        <ActionBtn
           type="button"
           onClick={(e) => {
             e.stopPropagation()
@@ -50,9 +47,8 @@ export default function ChatItem({ chat, active, onSelect, onEdit, onDelete }: C
           title="Редактировать"
         >
           ✎
-        </button>
-        <button
-          className={styles.actionBtn}
+        </ActionBtn>
+        <ActionBtn
           type="button"
           onClick={(e) => {
             e.stopPropagation()
@@ -62,8 +58,8 @@ export default function ChatItem({ chat, active, onSelect, onEdit, onDelete }: C
           title="Удалить"
         >
           ⌫
-        </button>
-      </div>
-    </div>
+        </ActionBtn>
+      </Actions>
+    </Item>
   )
 }

@@ -1,6 +1,6 @@
 import ReactMarkdown from 'react-markdown'
 import type { ChatMessage } from '../../types'
-import styles from './Chat.module.css'
+import { Avatar, Bubble, BubbleWrap, CopyButton, Markdown, Meta, Row } from './styles'
 
 type MessageProps = {
   message: ChatMessage
@@ -13,25 +13,23 @@ function copyToClipboard(text: string) {
 
 export default function Message({ message }: MessageProps) {
   const isUser = message.role === 'user'
-
-  const rowCls = [styles.row, isUser ? styles.rowUser : undefined].filter(Boolean).join(' ')
-  const bubbleCls = [styles.bubble, isUser ? styles.bubbleUser : undefined].filter(Boolean).join(' ')
+  const variant = isUser ? 'user' : 'assistant'
 
   return (
-    <div className={rowCls}>
-      {isUser ? null : <div className={styles.avatar}>G</div>}
+    <Row $variant={variant}>
+      {isUser ? null : <Avatar>G</Avatar>}
 
-      <div className={styles.bubbleWrap}>
-        <div className={styles.meta}>{message.author}</div>
-        <div className={bubbleCls}>
-          <button className={styles.copy} type="button" onClick={() => copyToClipboard(message.content)}>
+      <BubbleWrap>
+        <Meta>{message.author}</Meta>
+        <Bubble $variant={variant}>
+          <CopyButton type="button" onClick={() => copyToClipboard(message.content)}>
             Copy
-          </button>
-          <div className={styles.md}>
+          </CopyButton>
+          <Markdown $variant={variant}>
             <ReactMarkdown>{message.content}</ReactMarkdown>
-          </div>
-        </div>
-      </div>
-    </div>
+          </Markdown>
+        </Bubble>
+      </BubbleWrap>
+    </Row>
   )
 }

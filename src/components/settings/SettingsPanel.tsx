@@ -2,8 +2,8 @@ import type { ChatSettings, Theme } from '../../types'
 import Button from '../ui/Button'
 import Slider from '../ui/Slider'
 import Toggle from '../ui/Toggle'
-import ui from '../ui/ui.module.css'
-import styles from './SettingsPanel.module.css'
+import { FieldLabel, Input, Select, Textarea } from '../ui/styles'
+import { Actions, Body, Head, Overlay, Panel, Row, Title } from './styles'
 
 type SettingsPanelProps = {
   isOpen: boolean
@@ -29,29 +29,22 @@ export default function SettingsPanel({
   if (!isOpen) return null
 
   return (
-    <div
-      className={styles.overlay}
-      role="dialog"
-      aria-modal="true"
-      aria-label="Настройки"
-      onClick={onClose}
-    >
-      <div className={styles.panel} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.head}>
-          <h3 className={styles.title}>Настройки</h3>
+    <Overlay role="dialog" aria-modal="true" aria-label="Настройки" onClick={onClose}>
+      <Panel onClick={(e) => e.stopPropagation()}>
+        <Head>
+          <Title>Настройки</Title>
           <Button type="button" variant="ghost" iconOnly onClick={onClose} aria-label="Закрыть">
             ✕
           </Button>
-        </div>
+        </Head>
 
-        <div className={styles.body}>
-          <div className={styles.row}>
-            <label className={ui.fieldLabel} htmlFor="model">
+        <Body>
+          <Row>
+            <FieldLabel htmlFor="model">
               Model
-            </label>
-            <select
+            </FieldLabel>
+            <Select
               id="model"
-              className={ui.select}
               value={settings.model}
               onChange={(e) => onChangeSettings({ ...settings, model: e.target.value as ChatSettings['model'] })}
             >
@@ -59,8 +52,8 @@ export default function SettingsPanel({
               <option value="GigaChat-Plus">GigaChat-Plus</option>
               <option value="GigaChat-Pro">GigaChat-Pro</option>
               <option value="GigaChat-Max">GigaChat-Max</option>
-            </select>
-          </div>
+            </Select>
+          </Row>
 
           <Slider
             label="Temperature"
@@ -80,49 +73,47 @@ export default function SettingsPanel({
             onChange={(v) => onChangeSettings({ ...settings, topP: v })}
           />
 
-          <div className={styles.row}>
-            <label className={ui.fieldLabel} htmlFor="maxTokens">
+          <Row>
+            <FieldLabel htmlFor="maxTokens">
               Max Tokens
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="maxTokens"
-              className={ui.input}
               type="number"
               value={settings.maxTokens}
               min={1}
               step={1}
               onChange={(e) => onChangeSettings({ ...settings, maxTokens: Number(e.target.value) })}
             />
-          </div>
+          </Row>
 
-          <div className={styles.row}>
-            <label className={ui.fieldLabel} htmlFor="systemPrompt">
+          <Row>
+            <FieldLabel htmlFor="systemPrompt">
               System Prompt
-            </label>
-            <textarea
+            </FieldLabel>
+            <Textarea
               id="systemPrompt"
-              className={ui.textarea}
               value={settings.systemPrompt}
               onChange={(e) => onChangeSettings({ ...settings, systemPrompt: e.target.value })}
             />
-          </div>
+          </Row>
 
           <Toggle
             checked={theme === 'dark'}
             onChange={(checked) => onChangeTheme(checked ? 'dark' : 'light')}
             label="Тема"
           />
-        </div>
+        </Body>
 
-        <div className={styles.actions}>
+        <Actions>
           <Button type="button" variant="ghost" onClick={onReset}>
             Сбросить
           </Button>
           <Button type="button" variant="primary" onClick={onSave}>
             Сохранить
           </Button>
-        </div>
-      </div>
-    </div>
+        </Actions>
+      </Panel>
+    </Overlay>
   )
 }

@@ -1,4 +1,4 @@
-import styles from './ui.module.css'
+import { Empty, EmptyCard, EmptyText, EmptyTitle } from './styles'
 
 type EmptyStateProps = {
   title?: string
@@ -10,11 +10,11 @@ export default function EmptyState({
   text = 'Выберите чат слева или создайте новый, чтобы начать переписку.',
 }: EmptyStateProps) {
   return (
-    <div className={styles.empty}>
-      <div className={styles.emptyCard}>
-        <h2 className={styles.emptyTitle}>{title}</h2>
-        <p className={styles.emptyText}>{text}</p>
-      </div>
-    </div>
+    <Empty>
+      <EmptyCard>
+        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyText>{text}</EmptyText>
+      </EmptyCard>
+    </Empty>
   )
 }

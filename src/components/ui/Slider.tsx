@@ -1,4 +1,4 @@
-import styles from './ui.module.css'
+import { FieldLabel, SliderInput, SliderRow } from './styles'
 
 type SliderProps = {
   label: string
@@ -12,12 +12,11 @@ type SliderProps = {
 export default function Slider({ label, value, min, max, step, onChange }: SliderProps) {
   return (
     <div>
-      <div className={styles.sliderRow}>
-        <label className={styles.fieldLabel}>{label}</label>
-        <div className={styles.fieldLabel}>{value.toFixed(2)}</div>
-      </div>
-      <input
-        className={styles.slider}
+      <SliderRow>
+        <FieldLabel as="span">{label}</FieldLabel>
+        <FieldLabel as="span">{value.toFixed(2)}</FieldLabel>
+      </SliderRow>
+      <SliderInput
         type="range"
         min={min}
         max={max}

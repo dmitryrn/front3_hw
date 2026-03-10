@@ -2,7 +2,7 @@ import type { Chat } from '../../types'
 import Button from '../ui/Button'
 import SearchInput from './SearchInput'
 import ChatList from './ChatList'
-import styles from './Sidebar.module.css'
+import { NewChat, Overlay, Plus, SidebarAside, Top } from './styles'
 
 type SidebarProps = {
   isOpen: boolean
@@ -29,28 +29,21 @@ export default function Sidebar({
   onEditChat,
   onDeleteChat,
 }: SidebarProps) {
-  const overlayCls = [styles.overlay, isOpen ? styles.overlayOpen : undefined]
-    .filter(Boolean)
-    .join(' ')
-  const sidebarCls = [styles.sidebar, isOpen ? styles.sidebarOpen : undefined]
-    .filter(Boolean)
-    .join(' ')
-
   return (
     <>
-      <div className={overlayCls} onClick={onClose} aria-hidden />
-      <aside className={sidebarCls} aria-label="Боковая панель">
-        <div className={styles.top}>
+      <Overlay $open={isOpen} onClick={onClose} aria-hidden />
+      <SidebarAside $open={isOpen} aria-label="Боковая панель">
+        <Top>
           <Button variant="primary" type="button" onClick={onNewChat}>
-            <span className={styles.newChat}>
-              <span className={styles.plus} aria-hidden>
+            <NewChat>
+              <Plus aria-hidden>
                 +
-              </span>
+              </Plus>
               Новый чат
-            </span>
+            </NewChat>
           </Button>
           <SearchInput value={searchValue} onChange={onSearchChange} />
-        </div>
+        </Top>
         <ChatList
           chats={chats}
           activeChatId={activeChatId}
@@ -61,7 +54,7 @@ export default function Sidebar({
           onEditChat={onEditChat}
           onDeleteChat={onDeleteChat}
         />
-      </aside>
+      </SidebarAside>
     </>
   )
 }

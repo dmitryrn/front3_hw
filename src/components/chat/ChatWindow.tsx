@@ -3,7 +3,7 @@ import Button from '../ui/Button'
 import EmptyState from '../ui/EmptyState'
 import InputArea from './InputArea'
 import MessageList from './MessageList'
-import styles from './Chat.module.css'
+import { BurgerButton, Header, Title, TitleRow, Window } from './styles'
 
 type ChatWindowProps = {
   chatTitle: string
@@ -25,31 +25,22 @@ export default function ChatWindow({
   const hasMessages = messages.length > 0
 
   return (
-    <section className={styles.window} aria-label="Чат">
-      <header className={styles.header}>
-        <div className={styles.titleRow}>
-          <Button
-            className={styles.burger}
-            type="button"
-            variant="ghost"
-            iconOnly
-            onClick={onOpenSidebar}
-            aria-label="Открыть меню"
-          >
+    <Window aria-label="Чат">
+      <Header>
+        <TitleRow>
+          <BurgerButton type="button" variant="ghost" iconOnly onClick={onOpenSidebar} aria-label="Открыть меню">
             ☰
-          </Button>
-          <h2 className={styles.title} title={chatTitle}>
-            {chatTitle}
-          </h2>
-        </div>
+          </BurgerButton>
+          <Title title={chatTitle}>{chatTitle}</Title>
+        </TitleRow>
         <Button type="button" variant="ghost" iconOnly onClick={onOpenSettings} aria-label="Настройки">
           ⚙
         </Button>
-      </header>
+      </Header>
 
       {hasMessages ? <MessageList messages={messages} isTypingVisible={isTypingVisible} /> : <EmptyState />}
 
       <InputArea onSend={onSendMessage} />
-    </section>
+    </Window>
   )
 }

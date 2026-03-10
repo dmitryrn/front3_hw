@@ -1,13 +1,15 @@
-.overlay {
+import styled from 'styled-components'
+
+export const Overlay = styled.div`
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
   display: grid;
   justify-items: end;
   z-index: 50;
-}
+`
 
-.panel {
+export const Panel = styled.div`
   width: min(520px, 100%);
   height: 100%;
   border-left: 1px solid var(--color-border);
@@ -15,38 +17,38 @@
   box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
-}
+`
 
-.head {
+export const Head = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding: 14px 16px;
   border-bottom: 1px solid var(--color-border);
-}
+`
 
-.title {
+export const Title = styled.h3`
   margin: 0;
   font-size: 14px;
-}
+`
 
-.body {
+export const Body = styled.div`
   padding: 14px 16px;
   overflow: auto;
   display: grid;
   gap: 12px;
-}
+`
 
-.row {
+export const Row = styled.div`
   display: grid;
   gap: 6px;
-}
+`
 
-.actions {
+export const Actions = styled.div`
   padding: 14px 16px;
   border-top: 1px solid var(--color-border);
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-}
+`

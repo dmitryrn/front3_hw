@@ -1,4 +1,4 @@
-import ui from '../ui/ui.module.css'
+import { Input } from '../ui/styles'
 
 type SearchInputProps = {
   value: string
@@ -7,8 +7,7 @@ type SearchInputProps = {
 
 export default function SearchInput({ value, onChange }: SearchInputProps) {
   return (
-    <input
-      className={ui.input}
+    <Input
       type="search"
       value={value}
       onChange={(e) => onChange(e.target.value)}

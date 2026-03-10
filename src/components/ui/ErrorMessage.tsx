@@ -1,4 +1,4 @@
-import styles from './ui.module.css'
+import { Error, ErrorIcon } from './styles'
 
 type ErrorMessageProps = {
   message: string
@@ -6,11 +6,11 @@ type ErrorMessageProps = {
 
 export default function ErrorMessage({ message }: ErrorMessageProps) {
   return (
-    <div className={styles.error} role="alert">
-      <span className={styles.errorIcon} aria-hidden>
+    <Error role="alert">
+      <ErrorIcon aria-hidden>
         !
-      </span>
+      </ErrorIcon>
       <span>{message}</span>
-    </div>
+    </Error>
   )
 }

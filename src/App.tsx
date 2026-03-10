@@ -84,8 +84,9 @@ export default function App() {
 
     setChats((prev) => prev.filter((c) => c.id !== chatId))
     setMessagesByChatId((prev) => {
-      const { [chatId]: _removed, ...rest } = prev
-      return rest
+      const next = { ...prev }
+      delete next[chatId]
+      return next
     })
 
     if (nextActiveId !== activeChatId) setActiveChatId(nextActiveId)

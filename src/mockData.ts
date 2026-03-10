@@ -51,7 +51,7 @@ export const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
       role: 'assistant',
       author: 'GigaChat',
       createdAt: '2026-03-09T10:06:00.000Z',
-      content: `Вот блок кода:\n\n\`\`\`ts\ntype Message = { role: \"user\" | \"assistant\"; content: string }\n\`\`\`\n\nИ **жирный** текст.`,
+      content: `Вот блок кода:\n\n\`\`\`ts\ntype Message = { role: "user" | "assistant"; content: string }\n\`\`\`\n\nИ **жирный** текст.`,
     },
     {
       id: 'm6',

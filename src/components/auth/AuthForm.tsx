@@ -1,8 +1,8 @@
 import type { AuthScope } from '../../types'
 import Button from '../ui/Button'
 import ErrorMessage from '../ui/ErrorMessage'
-import ui from '../ui/ui.module.css'
-import styles from './AuthForm.module.css'
+import { FieldLabel, Input } from '../ui/styles'
+import { Actions, Card, Grid, Radio, Radios, Subtitle, Title, Wrap } from './styles'
 
 type AuthFormProps = {
   credentials: string
@@ -22,19 +22,18 @@ export default function AuthForm({
   onSubmit,
 }: AuthFormProps) {
   return (
-    <div className={styles.wrap}>
-      <div className={styles.card}>
-        <h1 className={styles.title}>Вход</h1>
-        <p className={styles.subtitle}>Введите Credentials и выберите Scope. Данные не сохраняются.</p>
+    <Wrap>
+      <Card>
+        <Title>Вход</Title>
+        <Subtitle>Введите Credentials и выберите Scope. Данные не сохраняются.</Subtitle>
 
-        <div className={styles.grid}>
+        <Grid>
           <div>
-            <label className={ui.fieldLabel} htmlFor="credentials">
+            <FieldLabel htmlFor="credentials">
               Credentials (Base64)
-            </label>
-            <input
+            </FieldLabel>
+            <Input
               id="credentials"
-              className={ui.input}
               type="password"
               value={credentials}
               onChange={(e) => onCredentialsChange(e.target.value)}
@@ -46,9 +45,9 @@ export default function AuthForm({
           {error ? <ErrorMessage message={error} /> : null}
 
           <div>
-            <div className={ui.fieldLabel}>Scope</div>
-            <div className={styles.radios}>
-              <label className={styles.radio}>
+            <FieldLabel as="span">Scope</FieldLabel>
+            <Radios>
+              <Radio>
                 <input
                   type="radio"
                   name="scope"
@@ -56,8 +55,8 @@ export default function AuthForm({
                   onChange={() => onScopeChange('GIGACHAT_API_PERS')}
                 />
                 <span>GIGACHAT_API_PERS</span>
-              </label>
-              <label className={styles.radio}>
+              </Radio>
+              <Radio>
                 <input
                   type="radio"
                   name="scope"
@@ -65,8 +64,8 @@ export default function AuthForm({
                   onChange={() => onScopeChange('GIGACHAT_API_B2B')}
                 />
                 <span>GIGACHAT_API_B2B</span>
-              </label>
-              <label className={styles.radio}>
+              </Radio>
+              <Radio>
                 <input
                   type="radio"
                   name="scope"
@@ -74,17 +73,17 @@ export default function AuthForm({
                   onChange={() => onScopeChange('GIGACHAT_API_CORP')}
                 />
                 <span>GIGACHAT_API_CORP</span>
-              </label>
-            </div>
+              </Radio>
+            </Radios>
           </div>
 
-          <div className={styles.actions}>
+          <Actions>
             <Button variant="primary" type="button" onClick={onSubmit}>
               Войти
             </Button>
-          </div>
-        </div>
-      </div>
-    </div>
+          </Actions>
+        </Grid>
+      </Card>
+    </Wrap>
   )
 }

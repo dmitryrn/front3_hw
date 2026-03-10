@@ -1,6 +1,7 @@
+import type { RefObject } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Button from '../ui/Button'
-import styles from './Chat.module.css'
+import { Buttons, Composer, InputWrap, Textarea } from './styles'
 
 type InputAreaProps = {
   onSend: (text: string) => void
@@ -14,20 +15,21 @@ function getMaxHeight(textarea: HTMLTextAreaElement) {
   return lineHeight * 5 + paddingTop + paddingBottom
 }
 
-function useAutosize(textarea: HTMLTextAreaElement | null, value: string) {
+function useAutosize(ref: RefObject<HTMLTextAreaElement | null>, value: string) {
   useEffect(() => {
-    if (!textarea) return
-    textarea.style.height = 'auto'
-    const maxHeight = getMaxHeight(textarea)
-    textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`
-  }, [textarea, value])
+    const el = ref.current
+    if (!el) return
+    el.style.height = 'auto'
+    const maxHeight = getMaxHeight(el)
+    el.style.height = `${Math.min(el.scrollHeight, maxHeight)}px`
+  }, [ref, value])
 }
 
 export default function InputArea({ onSend }: InputAreaProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
-  useAutosize(textareaRef.current, value)
+  useAutosize(textareaRef, value)
 
   const canSend = useMemo(() => value.trim().length > 0, [value])
 
@@ -39,11 +41,10 @@ export default function InputArea({ onSend }: InputAreaProps) {
   }
 
   return (
-    <div className={styles.inputWrap}>
-      <div className={styles.composer}>
-        <textarea
+    <InputWrap>
+      <Composer>
+        <Textarea
           ref={textareaRef}
-          className={styles.textarea}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="Напишите сообщение..."
@@ -56,7 +57,7 @@ export default function InputArea({ onSend }: InputAreaProps) {
           }}
         />
 
-        <div className={styles.buttons}>
+        <Buttons>
           <Button type="button" variant="ghost" iconOnly aria-label="Прикрепить">
             ⊕
           </Button>
@@ -66,8 +67,8 @@ export default function InputArea({ onSend }: InputAreaProps) {
           <Button type="button" variant="primary" disabled={!canSend} onClick={send}>
             Отправить
           </Button>
-        </div>
-      </div>
-    </div>
+        </Buttons>
+      </Composer>
+    </InputWrap>
   )
 }

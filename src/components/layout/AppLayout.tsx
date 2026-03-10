@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import styles from './AppLayout.module.css'
+import { Layout, Main } from './styles'
 
 type AppLayoutProps = {
   sidebar: ReactNode
@@ -8,9 +8,9 @@ type AppLayoutProps = {
 
 export default function AppLayout({ sidebar, chat }: AppLayoutProps) {
   return (
-    <div className={styles.layout}>
+    <Layout>
       {sidebar}
-      <main className={styles.main}>{chat}</main>
-    </div>
+      <Main>{chat}</Main>
+    </Layout>
   )
 }

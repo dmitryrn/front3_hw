@@ -1,4 +1,4 @@
-import styles from './ui.module.css'
+import { ToggleThumb, ToggleTrack, ToggleWrap } from './styles'
 
 type ToggleProps = {
   checked: boolean
@@ -7,16 +7,12 @@ type ToggleProps = {
 }
 
 export default function Toggle({ checked, onChange, label }: ToggleProps) {
-  const trackClass = [styles.toggleTrack, checked ? styles.toggleOn : undefined]
-    .filter(Boolean)
-    .join(' ')
-
   return (
-    <label className={styles.toggle}>
+    <ToggleWrap>
       <span>{label}</span>
-      <span className={trackClass}>
-        <span className={styles.toggleThumb} />
-      </span>
+      <ToggleTrack>
+        <ToggleThumb $checked={checked} />
+      </ToggleTrack>
       <input
         type="checkbox"
         checked={checked}
@@ -24,6 +20,6 @@ export default function Toggle({ checked, onChange, label }: ToggleProps) {
         style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }}
         aria-label={label}
       />
-    </label>
+    </ToggleWrap>
   )
 }
