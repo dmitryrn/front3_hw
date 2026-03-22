@@ -102,7 +102,7 @@ export default function App() {
 
     const msg: ChatMessage = {
       id: id('msg'),
-      variant: 'user',
+      role: 'user',
       author: 'Вы',
       content: text,
       createdAt: nowIso(),

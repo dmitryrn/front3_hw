@@ -15,7 +15,7 @@ export type MessageVariant = 'user' | 'assistant'
 
 export type ChatMessage = {
   id: string
-  variant: MessageVariant
+  role: MessageVariant
   author: string
   content: string
   createdAt: string
