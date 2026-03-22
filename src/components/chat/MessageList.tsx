@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import type { ChatMessage } from '../../types'
 import Message from './Message'
 import TypingIndicator from './TypingIndicator'
@@ -9,6 +10,12 @@ type MessageListProps = {
 }
 
 export default function MessageList({ messages, isLoading }: MessageListProps) {
+  const endRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
   return (
     <Messages>
       <Stack>
@@ -27,6 +34,8 @@ export default function MessageList({ messages, isLoading }: MessageListProps) {
             </BubbleWrap>
           </Row>
         ) : null}
+
+        <div ref={endRef} />
       </Stack>
     </Messages>
   )
