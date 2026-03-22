@@ -1,5 +1,5 @@
 import type { Chat } from '../../types'
-import { ActionBtn, Actions, Item, Meta, Title } from './styles'
+import { ActionBtn, Actions, Content, Item, Meta, Title } from './styles'
 
 type ChatItemProps = {
   chat: Chat
@@ -29,12 +29,12 @@ export default function ChatItem({ chat, active, onSelect, onEdit, onDelete }: C
         onSelect()
       }}
     >
-      <div style={{ minWidth: 0 }}>
+      <Content>
         <Title title={chat.title}>
           {chat.title}
         </Title>
         <Meta>{formatDate(chat.lastMessageAt)}</Meta>
-      </div>
+      </Content>
 
       <Actions>
         <ActionBtn

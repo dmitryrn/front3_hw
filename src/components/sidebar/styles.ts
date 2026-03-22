@@ -95,6 +95,10 @@ export const Title = styled.div`
   white-space: nowrap;
 `
 
+export const Content = styled.div`
+  min-width: 0;
+`
+
 export const Meta = styled.div`
   font-size: 12px;
   color: var(--color-muted);

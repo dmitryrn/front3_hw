@@ -119,6 +119,13 @@ export const ToggleWrap = styled.label`
   display: inline-flex;
   align-items: center;
   gap: 10px;
+  position: relative;
+`
+
+export const ToggleInput = styled.input`
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 `
 
 export const ToggleTrack = styled.span`

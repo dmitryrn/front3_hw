@@ -62,12 +62,16 @@ export default function InputArea({ isLoading = false, onSend }: InputAreaProps)
           <Button type="button" variant="ghost" iconOnly aria-label="Прикрепить">
             ⊕
           </Button>
-          <Button type="button" variant="ghost" disabled iconOnly aria-label="Стоп">
-            ■
-          </Button>
-          <Button type="button" variant="primary" disabled={!canSend} onClick={send}>
-            Отправить
-          </Button>
+
+          {isLoading ? (
+            <Button type="button" variant="ghost" disabled iconOnly aria-label="Стоп">
+              ■
+            </Button>
+          ) : (
+            <Button type="button" variant="primary" disabled={!canSend} onClick={send}>
+              Отправить
+            </Button>
+          )}
         </Buttons>
       </Composer>
     </InputWrap>

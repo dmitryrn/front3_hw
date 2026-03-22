@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { ChatMessage } from '../../types'
 import { Avatar, Bubble, BubbleWrap, CopyButton, Markdown, Meta, Row } from './styles'
@@ -6,14 +7,27 @@ type MessageProps = {
   message: ChatMessage
 }
 
-function copyToClipboard(text: string) {
-  if (!text) return
-  void navigator.clipboard?.writeText(text)
-}
-
 export default function Message({ message }: MessageProps) {
+  const [isCopied, setIsCopied] = useState(false)
   const isUser = message.role === 'user'
   const variant = isUser ? 'user' : 'assistant'
+
+  useEffect(() => {
+    if (!isCopied) return
+
+    const timeoutId = window.setTimeout(() => {
+      setIsCopied(false)
+    }, 2000)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [isCopied])
+
+  const copyToClipboard = async () => {
+    if (!message.content || !navigator.clipboard) return
+
+    await navigator.clipboard.writeText(message.content)
+    setIsCopied(true)
+  }
 
   return (
     <Row $variant={variant}>
@@ -22,9 +36,11 @@ export default function Message({ message }: MessageProps) {
       <BubbleWrap>
         <Meta>{message.author}</Meta>
         <Bubble $variant={variant}>
-          <CopyButton type="button" onClick={() => copyToClipboard(message.content)}>
-            Copy
-          </CopyButton>
+          {!isUser ? (
+            <CopyButton type="button" onClick={() => void copyToClipboard()}>
+              {isCopied ? 'Скопировано' : 'Копировать'}
+            </CopyButton>
+          ) : null}
           <Markdown $variant={variant}>
             <ReactMarkdown>{message.content}</ReactMarkdown>
           </Markdown>
