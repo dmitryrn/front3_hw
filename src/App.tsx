@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import type { AuthScope, Chat, ChatMessage, ChatSettings, Theme } from './types'
 import AuthForm from './components/auth/AuthForm'
 import AppLayout from './components/layout/AppLayout'
@@ -13,6 +13,10 @@ function nowIso() {
 
 function id(prefix: string) {
   return `${prefix}_${Math.random().toString(16).slice(2, 10)}`
+}
+
+function buildMockAssistantReply(text: string) {
+  return `Моковый ответ ассистента на сообщение: "${text}"`
 }
 
 export default function App() {
@@ -36,10 +40,21 @@ export default function App() {
   const [chats, setChats] = useState<Chat[]>(MOCK_CHATS)
   const [activeChatId, setActiveChatId] = useState(MOCK_CHATS[0]?.id ?? '')
   const [messagesByChatId, setMessagesByChatId] = useState<Record<string, ChatMessage[]>>(MOCK_MESSAGES)
+  const [isLoading, setIsLoading] = useState(false)
+  const [loadingChatId, setLoadingChatId] = useState('')
+  const replyTimeoutIdRef = useRef<number | null>(null)
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
   }, [theme])
+
+  useEffect(() => {
+    return () => {
+      if (replyTimeoutIdRef.current !== null) {
+        window.clearTimeout(replyTimeoutIdRef.current)
+      }
+    }
+  }, [])
 
   const visibleChats = useMemo(() => {
     const q = searchValue.trim().toLowerCase()
@@ -49,6 +64,7 @@ export default function App() {
 
   const activeChat = useMemo(() => chats.find((c) => c.id === activeChatId) ?? null, [chats, activeChatId])
   const messages = messagesByChatId[activeChatId] ?? []
+  const isChatLoading = isLoading && loadingChatId === activeChatId
 
   const openSidebar = () => setIsSidebarOpen(true)
   const closeSidebar = () => setIsSidebarOpen(false)
@@ -98,7 +114,9 @@ export default function App() {
   }
 
   const onSendMessage = (text: string) => {
-    if (!activeChatId) return
+    if (!activeChatId || isLoading) return
+
+    const chatId = activeChatId
 
     const msg: ChatMessage = {
       id: id('msg'),
@@ -110,10 +128,33 @@ export default function App() {
 
     setMessagesByChatId((prev) => ({
       ...prev,
-      [activeChatId]: [...(prev[activeChatId] ?? []), msg],
+      [chatId]: [...(prev[chatId] ?? []), msg],
     }))
 
-    setChats((prev) => prev.map((c) => (c.id === activeChatId ? { ...c, lastMessageAt: msg.createdAt } : c)))
+    setChats((prev) => prev.map((c) => (c.id === chatId ? { ...c, lastMessageAt: msg.createdAt } : c)))
+    setIsLoading(true)
+    setLoadingChatId(chatId)
+
+    replyTimeoutIdRef.current = window.setTimeout(() => {
+      const assistantMessage: ChatMessage = {
+        id: id('msg'),
+        role: 'assistant',
+        author: 'GigaChat',
+        content: buildMockAssistantReply(text),
+        createdAt: nowIso(),
+      }
+
+      setMessagesByChatId((prev) => ({
+        ...prev,
+        [chatId]: [...(prev[chatId] ?? []), assistantMessage],
+      }))
+      setChats((prev) =>
+        prev.map((c) => (c.id === chatId ? { ...c, lastMessageAt: assistantMessage.createdAt } : c)),
+      )
+      setIsLoading(false)
+      setLoadingChatId('')
+      replyTimeoutIdRef.current = null
+    }, 1000 + Math.floor(Math.random() * 1000))
   }
 
   const onResetSettings = () => {
@@ -157,7 +198,7 @@ export default function App() {
           <ChatWindow
             chatTitle={safeChatTitle}
             messages={messages}
-            isTypingVisible
+            isLoading={isChatLoading}
             onOpenSidebar={openSidebar}
             onOpenSettings={openSettings}
             onSendMessage={onSendMessage}

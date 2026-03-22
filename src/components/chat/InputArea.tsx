@@ -4,6 +4,7 @@ import Button from '../ui/Button'
 import { Buttons, Composer, InputWrap, Textarea } from './styles'
 
 type InputAreaProps = {
+  isLoading?: boolean
   onSend: (text: string) => void
 }
 
@@ -25,17 +26,17 @@ function useAutosize(ref: RefObject<HTMLTextAreaElement | null>, value: string) 
   }, [ref, value])
 }
 
-export default function InputArea({ onSend }: InputAreaProps) {
+export default function InputArea({ isLoading = false, onSend }: InputAreaProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
   useAutosize(textareaRef, value)
 
-  const canSend = useMemo(() => value.trim().length > 0, [value])
+  const canSend = useMemo(() => value.trim().length > 0 && !isLoading, [isLoading, value])
 
   const send = () => {
     const text = value.trim()
-    if (!text) return
+    if (!text || isLoading) return
     onSend(text)
     setValue('')
   }

@@ -5,10 +5,10 @@ import { Avatar, Bubble, BubbleWrap, Messages, Meta, Row, Stack } from './styles
 
 type MessageListProps = {
   messages: ChatMessage[]
-  isTypingVisible?: boolean
+  isLoading?: boolean
 }
 
-export default function MessageList({ messages, isTypingVisible }: MessageListProps) {
+export default function MessageList({ messages, isLoading }: MessageListProps) {
   return (
     <Messages>
       <Stack>
@@ -16,7 +16,7 @@ export default function MessageList({ messages, isTypingVisible }: MessageListPr
           <Message key={m.id} message={m} />
         ))}
 
-        {isTypingVisible ? (
+        {isLoading ? (
           <Row $variant="assistant">
             <Avatar>G</Avatar>
             <BubbleWrap>

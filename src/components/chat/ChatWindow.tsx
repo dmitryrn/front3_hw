@@ -8,7 +8,7 @@ import { BurgerButton, Header, Title, TitleRow, Window } from './styles'
 type ChatWindowProps = {
   chatTitle: string
   messages: ChatMessage[]
-  isTypingVisible?: boolean
+  isLoading?: boolean
   onOpenSidebar: () => void
   onOpenSettings: () => void
   onSendMessage: (text: string) => void
@@ -17,7 +17,7 @@ type ChatWindowProps = {
 export default function ChatWindow({
   chatTitle,
   messages,
-  isTypingVisible,
+  isLoading,
   onOpenSidebar,
   onOpenSettings,
   onSendMessage,
@@ -38,9 +38,9 @@ export default function ChatWindow({
         </Button>
       </Header>
 
-      {hasMessages ? <MessageList messages={messages} isTypingVisible={isTypingVisible} /> : <EmptyState />}
+      {hasMessages ? <MessageList messages={messages} isLoading={isLoading} /> : <EmptyState />}
 
-      <InputArea onSend={onSendMessage} />
+      <InputArea isLoading={isLoading} onSend={onSendMessage} />
     </Window>
   )
 }
