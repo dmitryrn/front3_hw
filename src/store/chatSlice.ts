@@ -11,8 +11,32 @@ function id(prefix: string) {
   return `${prefix}_${Math.random().toString(16).slice(2, 10)}`
 }
 
+const DEFAULT_CHAT_TITLE = 'Новый чат'
+const FALLBACK_CHAT_PREFIX = 'Диалог'
+const MIN_GENERATED_TITLE_LENGTH = 3
+const MAX_GENERATED_TITLE_LENGTH = 36
+
 function buildMockAssistantReply(text: string) {
   return `Моковый ответ ассистента на сообщение: "${text}"`
+}
+
+function getDefaultChatTitle(chats: Chat[]) {
+  return chats.length === 0 ? DEFAULT_CHAT_TITLE : `${FALLBACK_CHAT_PREFIX} ${chats.length + 1}`
+}
+
+function truncateTitle(value: string) {
+  if (value.length <= MAX_GENERATED_TITLE_LENGTH) return value
+  return `${value.slice(0, MAX_GENERATED_TITLE_LENGTH - 1).trimEnd()}...`
+}
+
+function getGeneratedChatTitle(text: string, chats: Chat[]) {
+  const normalizedText = text.replace(/\s+/g, ' ').trim()
+
+  if (normalizedText.length < MIN_GENERATED_TITLE_LENGTH) {
+    return getDefaultChatTitle(chats)
+  }
+
+  return truncateTitle(normalizedText)
 }
 
 function getCurrentChatMessages(messagesByChatId: Record<string, Message[]>, activeChatId: string) {
@@ -42,7 +66,11 @@ const chatSlice = createSlice({
     createChat: {
       reducer(state, action: PayloadAction<{ id: string }>) {
         const newId = action.payload.id
-        const newChat: Chat = { id: newId, title: 'Новый чат', lastMessageAt: nowIso() }
+        const newChat: Chat = {
+          id: newId,
+          title: getDefaultChatTitle(state.chats),
+          lastMessageAt: nowIso(),
+        }
 
         state.chats.unshift(newChat)
         state.messagesByChatId[newId] = []
@@ -88,11 +116,21 @@ const chatSlice = createSlice({
     },
     sendMessageStarted(state, action: PayloadAction<{ chatId: string; message: Message }>) {
       const { chatId, message } = action.payload
+      const currentMessages = state.messagesByChatId[chatId] ?? []
+      const shouldGenerateTitle = currentMessages.length === 0
+
       state.messagesByChatId[chatId] = [...(state.messagesByChatId[chatId] ?? []), message]
       state.chats = state.chats.map((chat) =>
-        chat.id === chatId ? { ...chat, lastMessageAt: message.createdAt } : chat,
+        chat.id === chatId
+          ? {
+              ...chat,
+              title: shouldGenerateTitle ? getGeneratedChatTitle(message.content, state.chats) : chat.title,
+              lastMessageAt: message.createdAt,
+            }
+          : chat,
       )
       state.currentChatMessages = getCurrentChatMessages(state.messagesByChatId, state.activeChatId)
+      state.activeChat = getActiveChat(state.chats, state.activeChatId)
       state.isLoading = true
       state.error = null
     },
