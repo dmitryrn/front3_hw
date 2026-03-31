@@ -34,7 +34,7 @@ export type ChatState = {
 }
 
 export type ChatAction =
-  | { type: 'chat/createChat' }
+  | { type: 'chat/createChat'; payload: { id: string } }
   | { type: 'chat/selectChat'; payload: string }
   | { type: 'chat/deleteChat'; payload: string }
   | { type: 'chat/editChatTitle'; payload: { chatId: string; title: string } }

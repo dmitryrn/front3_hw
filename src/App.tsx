@@ -1,20 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Navigate, Route, Routes, useMatch, useNavigate } from 'react-router-dom'
 import type { AuthScope, ChatSettings, Theme } from './types'
 import AuthForm from './components/auth/AuthForm'
 import AppLayout from './components/layout/AppLayout'
 import Sidebar from './components/sidebar/Sidebar'
 import ChatWindow from './components/chat/ChatWindow'
 import SettingsPanel from './components/settings/SettingsPanel'
+import EmptyState from './components/ui/EmptyState'
 import { DEFAULT_SETTINGS } from './mockData'
 import {
-  selectActiveChat,
   createChat,
   deleteChat,
   selectActiveChatId,
   selectChatError,
   selectChatLoading,
   selectChats,
-  selectCurrentChatMessages,
   selectMessagesByChatId,
   selectChat as selectChatAction,
   editChatTitle,
@@ -24,6 +24,9 @@ import { useAppDispatch, useAppSelector } from './store/hooks'
 
 export default function App() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
+  const chatRouteMatch = useMatch('/chat/:id')
+  const routeChatId = chatRouteMatch?.params.id ?? null
   const [theme, setTheme] = useState<Theme>('light')
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -42,9 +45,7 @@ export default function App() {
   const [searchValue, setSearchValue] = useState('')
 
   const chats = useAppSelector(selectChats)
-  const activeChat = useAppSelector(selectActiveChat)
   const activeChatId = useAppSelector(selectActiveChatId)
-  const messages = useAppSelector(selectCurrentChatMessages)
   const messagesByChatId = useAppSelector(selectMessagesByChatId)
   const isChatLoading = useAppSelector(selectChatLoading)
   const chatError = useAppSelector(selectChatError)
@@ -52,6 +53,11 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme
   }, [theme])
+
+  useEffect(() => {
+    if (!routeChatId) return
+    dispatch(selectChatAction(routeChatId))
+  }, [dispatch, routeChatId])
 
   const visibleChats = useMemo(() => {
     const q = searchValue.trim().toLowerCase()
@@ -61,6 +67,10 @@ export default function App() {
       return chat.title.toLowerCase().includes(q) || lastMessage.includes(q)
     })
   }, [chats, messagesByChatId, searchValue])
+
+  const routedChat = routeChatId ? chats.find((chat) => chat.id === routeChatId) ?? null : null
+  const routedMessages = routeChatId ? messagesByChatId[routeChatId] ?? [] : []
+  const sidebarActiveChatId = routeChatId ?? activeChatId
 
   const openSidebar = () => setIsSidebarOpen(true)
   const closeSidebar = () => setIsSidebarOpen(false)
@@ -82,11 +92,20 @@ export default function App() {
     setIsAuthed(true)
   }
 
-  const onNewChat = () => dispatch(createChat())
+  const onNewChat = () => {
+    const action = dispatch(createChat())
+    navigate(`/chat/${action.payload.id}`)
+  }
 
   const onEditChat = (chatId: string, title: string) => dispatch(editChatTitle({ chatId, title }))
 
-  const onDeleteChat = (chatId: string) => dispatch(deleteChat(chatId))
+  const onDeleteChat = (chatId: string) => {
+    dispatch(deleteChat(chatId))
+
+    if (routeChatId === chatId) {
+      navigate('/')
+    }
+  }
 
   const onSendMessage = (text: string) => {
     void dispatch(sendMessage(text))
@@ -110,8 +129,6 @@ export default function App() {
     )
   }
 
-  const safeChatTitle = activeChat?.title ?? 'Чат'
-
   return (
     <>
       <AppLayout
@@ -122,23 +139,42 @@ export default function App() {
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             chats={visibleChats}
-            activeChatId={activeChatId}
+            activeChatId={sidebarActiveChatId}
             onNewChat={onNewChat}
-            onSelectChat={(chatId) => dispatch(selectChatAction(chatId))}
+            onSelectChat={(chatId) => navigate(`/chat/${chatId}`)}
             onEditChat={onEditChat}
             onDeleteChat={onDeleteChat}
           />
         }
         chat={
-          <ChatWindow
-            chatTitle={safeChatTitle}
-            messages={messages}
-            isLoading={isChatLoading}
-            error={chatError}
-            onOpenSidebar={openSidebar}
-            onOpenSettings={openSettings}
-            onSendMessage={onSendMessage}
-          />
+          <Routes>
+            <Route
+              path="/"
+              element={<EmptyState title="Выберите чат" text="Откройте существующий чат слева или создайте новый." />}
+            />
+            <Route
+              path="/chat/:id"
+              element={
+                routedChat ? (
+                  <ChatWindow
+                    chatTitle={routedChat.title}
+                    messages={routedMessages}
+                    isLoading={isChatLoading}
+                    error={chatError}
+                    onOpenSidebar={openSidebar}
+                    onOpenSettings={openSettings}
+                    onSendMessage={onSendMessage}
+                  />
+                ) : (
+                  <EmptyState
+                    title="Чат не найден"
+                    text="Проверьте адрес или выберите другой чат в боковой панели."
+                  />
+                )
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         }
       />
 

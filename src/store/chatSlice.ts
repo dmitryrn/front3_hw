@@ -39,16 +39,21 @@ const chatSlice = createSlice({
   name: 'chat',
   initialState: initialChatState,
   reducers: {
-    createChat(state) {
-      const newId = id('chat')
-      const newChat: Chat = { id: newId, title: 'Новый чат', lastMessageAt: nowIso() }
+    createChat: {
+      reducer(state, action: PayloadAction<{ id: string }>) {
+        const newId = action.payload.id
+        const newChat: Chat = { id: newId, title: 'Новый чат', lastMessageAt: nowIso() }
 
-      state.chats.unshift(newChat)
-      state.messagesByChatId[newId] = []
-      state.activeChat = newChat
-      state.activeChatId = newId
-      state.currentChatMessages = []
-      state.error = null
+        state.chats.unshift(newChat)
+        state.messagesByChatId[newId] = []
+        state.activeChat = newChat
+        state.activeChatId = newId
+        state.currentChatMessages = []
+        state.error = null
+      },
+      prepare() {
+        return { payload: { id: id('chat') } }
+      },
     },
     selectChat(state, action: PayloadAction<string>) {
       state.activeChatId = action.payload
