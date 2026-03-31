@@ -1,7 +1,7 @@
 import type { Chat, ChatSettings, Message } from './types'
 
 export const DEFAULT_SETTINGS: ChatSettings = {
-  model: 'GigaChat',
+  model: 'gpt-5-mini',
   temperature: 0.7,
   topP: 0.95,
   maxTokens: 2048,

@@ -1,62 +1,41 @@
-import type { AuthScope } from '../../types'
 import Button from '../ui/Button'
 import ErrorMessage from '../ui/ErrorMessage'
 import { FieldLabel, Input } from '../ui/styles'
-import { Actions, Card, Grid, Radio, Radios, Subtitle, Title, Wrap } from './styles'
+import { Actions, Card, Grid, Subtitle, Title, Wrap } from './styles'
 
 type AuthFormProps = {
-  credentials: string
-  scope: AuthScope
+  apiKey: string
   error: string | null
-  onCredentialsChange: (value: string) => void
-  onScopeChange: (scope: AuthScope) => void
+  onApiKeyChange: (value: string) => void
   onSubmit: () => void
 }
 
-const SCOPES: AuthScope[] = ['GIGACHAT_API_PERS', 'GIGACHAT_API_B2B', 'GIGACHAT_API_CORP']
-
 export default function AuthForm({
-  credentials,
-  scope,
+  apiKey,
   error,
-  onCredentialsChange,
-  onScopeChange,
+  onApiKeyChange,
   onSubmit,
 }: AuthFormProps) {
   return (
     <Wrap>
       <Card>
         <Title>Вход</Title>
-        <Subtitle>Введите Credentials и выберите Scope. Данные не сохраняются.</Subtitle>
+        <Subtitle>Введите OpenAI API key. Данные не сохраняются.</Subtitle>
 
         <Grid>
           <div>
-            <FieldLabel htmlFor="credentials">
-              Credentials (Base64)
-            </FieldLabel>
+            <FieldLabel htmlFor="apiKey">OpenAI API Key</FieldLabel>
             <Input
-              id="credentials"
+              id="apiKey"
               type="password"
-              value={credentials}
-              onChange={(e) => onCredentialsChange(e.target.value)}
-              placeholder="base64..."
+              value={apiKey}
+              onChange={(e) => onApiKeyChange(e.target.value)}
+              placeholder="sk-..."
               autoComplete="off"
             />
           </div>
 
           {error ? <ErrorMessage message={error} /> : null}
-
-          <div>
-            <FieldLabel as="span">Scope</FieldLabel>
-            <Radios>
-              {SCOPES.map((v) => (
-                <Radio key={v}>
-                  <input type="radio" name="scope" checked={scope === v} onChange={() => onScopeChange(v)} />
-                  <span>{v}</span>
-                </Radio>
-              ))}
-            </Radios>
-          </div>
 
           <Actions>
             <Button variant="primary" type="button" onClick={onSubmit}>

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes, useMatch, useNavigate } from 'react-router-dom'
-import type { AuthScope, ChatSettings, Theme } from './types'
+import type { ChatSettings, Theme } from './types'
 import AuthForm from './components/auth/AuthForm'
 import AppLayout from './components/layout/AppLayout'
 import Sidebar from './components/sidebar/Sidebar'
@@ -31,14 +31,8 @@ export default function App() {
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
-  const initialAuthed =
-    import.meta.env.DEV &&
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).get('authed') === '1'
-
-  const [isAuthed, setIsAuthed] = useState(initialAuthed)
-  const [credentials, setCredentials] = useState('')
-  const [scope, setScope] = useState<AuthScope>('GIGACHAT_API_PERS')
+  const [isAuthed, setIsAuthed] = useState(false)
+  const [apiKey, setApiKey] = useState('')
   const [authError, setAuthError] = useState<string | null>(null)
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -77,14 +71,14 @@ export default function App() {
   const openSettings = () => setIsSettingsOpen(true)
   const closeSettings = () => setIsSettingsOpen(false)
 
-  const onCredentialsChange = (value: string) => {
-    setCredentials(value)
+  const onApiKeyChange = (value: string) => {
+    setApiKey(value)
     if (authError) setAuthError(null)
   }
 
   const onAuthSubmit = () => {
-    if (!credentials.trim()) {
-      setAuthError('Поле Credentials не должно быть пустым')
+    if (!apiKey.trim()) {
+      setAuthError('Поле OpenAI API Key не должно быть пустым')
       return
     }
 
@@ -108,7 +102,7 @@ export default function App() {
   }
 
   const onSendMessage = (text: string) => {
-    void dispatch(sendMessage(text))
+    void dispatch(sendMessage({ text, apiKey, settings }))
   }
 
   const onResetSettings = () => {
@@ -118,14 +112,7 @@ export default function App() {
 
   if (!isAuthed) {
     return (
-        <AuthForm
-          credentials={credentials}
-          scope={scope}
-          error={authError}
-          onCredentialsChange={onCredentialsChange}
-          onScopeChange={setScope}
-          onSubmit={onAuthSubmit}
-        />
+      <AuthForm apiKey={apiKey} error={authError} onApiKeyChange={onApiKeyChange} onSubmit={onAuthSubmit} />
     )
   }
 

@@ -1,10 +1,5 @@
 export type Theme = 'light' | 'dark'
 
-export type AuthScope =
-  | 'GIGACHAT_API_PERS'
-  | 'GIGACHAT_API_B2B'
-  | 'GIGACHAT_API_CORP'
-
 export type Chat = {
   id: string
   title: string
@@ -38,12 +33,13 @@ export type ChatAction =
   | { type: 'chat/selectChat'; payload: string }
   | { type: 'chat/deleteChat'; payload: string }
   | { type: 'chat/editChatTitle'; payload: { chatId: string; title: string } }
-  | { type: 'chat/sendMessageStarted'; payload: { chatId: string; message: Message } }
-  | { type: 'chat/sendMessageSucceeded'; payload: { chatId: string; message: Message } }
-  | { type: 'chat/sendMessageFailed'; payload: string }
+  | { type: 'chat/sendMessageStarted'; payload: { chatId: string; userMessage: Message; assistantMessage: Message } }
+  | { type: 'chat/updateAssistantMessage'; payload: { chatId: string; messageId: string; content: string } }
+  | { type: 'chat/sendMessageSucceeded'; payload: { chatId: string; messageId: string; content: string } }
+  | { type: 'chat/sendMessageFailed'; payload: { chatId: string; messageId: string; error: string } }
   | { type: 'chat/clearError' }
 
-export type ModelId = 'GigaChat' | 'GigaChat-Plus' | 'GigaChat-Pro' | 'GigaChat-Max'
+export type ModelId = 'gpt-5-mini'
 
 export type ChatSettings = {
   model: ModelId

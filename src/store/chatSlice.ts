@@ -1,7 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
+import { streamOpenAIChat } from '../api/openai'
 import type { AppDispatch, RootState } from './index'
 import { MOCK_CHATS, MOCK_MESSAGES } from '../mockData'
-import type { Chat, ChatAction, ChatState, Message } from '../types'
+import type { Chat, ChatAction, ChatSettings, ChatState, Message } from '../types'
 
 function nowIso() {
   return new Date().toISOString()
@@ -11,14 +12,11 @@ function id(prefix: string) {
   return `${prefix}_${Math.random().toString(16).slice(2, 10)}`
 }
 
+const ASSISTANT_AUTHOR = 'gpt-5-mini'
 const DEFAULT_CHAT_TITLE = 'Новый чат'
 const FALLBACK_CHAT_PREFIX = 'Диалог'
 const MIN_GENERATED_TITLE_LENGTH = 3
 const MAX_GENERATED_TITLE_LENGTH = 36
-
-function buildMockAssistantReply(text: string) {
-  return `Моковый ответ ассистента на сообщение: "${text}"`
-}
 
 function getDefaultChatTitle(chats: Chat[]) {
   return chats.length === 0 ? DEFAULT_CHAT_TITLE : `${FALLBACK_CHAT_PREFIX} ${chats.length + 1}`
@@ -37,6 +35,32 @@ function getGeneratedChatTitle(text: string, chats: Chat[]) {
   }
 
   return truncateTitle(normalizedText)
+}
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error && error.message) return error.message
+  return 'Не удалось получить ответ ассистента'
+}
+
+function buildRequestMessages(settings: ChatSettings, history: Message[], userMessage: Message) {
+  const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = []
+
+  if (settings.systemPrompt.trim()) {
+    messages.push({ role: 'system', content: settings.systemPrompt.trim() })
+  }
+
+  for (const message of [...history, userMessage]) {
+    messages.push({
+      role: message.role,
+      content: message.content,
+    })
+  }
+
+  return messages
+}
+
+function updateMessageContent(messages: Message[], messageId: string, content: string) {
+  return messages.map((message) => (message.id === messageId ? { ...message, content } : message))
 }
 
 function getCurrentChatMessages(messagesByChatId: Record<string, Message[]>, activeChatId: string) {
@@ -114,18 +138,18 @@ const chatSlice = createSlice({
       state.chats = state.chats.map((chat) => (chat.id === chatId ? { ...chat, title } : chat))
       state.activeChat = getActiveChat(state.chats, state.activeChatId)
     },
-    sendMessageStarted(state, action: PayloadAction<{ chatId: string; message: Message }>) {
-      const { chatId, message } = action.payload
+    sendMessageStarted(state, action: PayloadAction<{ chatId: string; userMessage: Message; assistantMessage: Message }>) {
+      const { chatId, userMessage, assistantMessage } = action.payload
       const currentMessages = state.messagesByChatId[chatId] ?? []
       const shouldGenerateTitle = currentMessages.length === 0
 
-      state.messagesByChatId[chatId] = [...(state.messagesByChatId[chatId] ?? []), message]
+      state.messagesByChatId[chatId] = [...currentMessages, userMessage, assistantMessage]
       state.chats = state.chats.map((chat) =>
         chat.id === chatId
           ? {
               ...chat,
-              title: shouldGenerateTitle ? getGeneratedChatTitle(message.content, state.chats) : chat.title,
-              lastMessageAt: message.createdAt,
+              title: shouldGenerateTitle ? getGeneratedChatTitle(userMessage.content, state.chats) : chat.title,
+              lastMessageAt: userMessage.createdAt,
             }
           : chat,
       )
@@ -134,19 +158,38 @@ const chatSlice = createSlice({
       state.isLoading = true
       state.error = null
     },
-    sendMessageSucceeded(state, action: PayloadAction<{ chatId: string; message: Message }>) {
-      const { chatId, message } = action.payload
-      state.messagesByChatId[chatId] = [...(state.messagesByChatId[chatId] ?? []), message]
+    updateAssistantMessage(state, action: PayloadAction<{ chatId: string; messageId: string; content: string }>) {
+      const { chatId, messageId, content } = action.payload
+      const currentMessages = state.messagesByChatId[chatId] ?? []
+      state.messagesByChatId[chatId] = updateMessageContent(currentMessages, messageId, content)
+      state.currentChatMessages = getCurrentChatMessages(state.messagesByChatId, state.activeChatId)
+    },
+    sendMessageSucceeded(state, action: PayloadAction<{ chatId: string; messageId: string; content: string }>) {
+      const { chatId, messageId, content } = action.payload
+      const currentMessages = state.messagesByChatId[chatId] ?? []
+      const completedMessages = updateMessageContent(currentMessages, messageId, content)
+      const message = completedMessages.find((item) => item.id === messageId)
+
+      state.messagesByChatId[chatId] = completedMessages
       state.chats = state.chats.map((chat) =>
-        chat.id === chatId ? { ...chat, lastMessageAt: message.createdAt } : chat,
+        chat.id === chatId && message ? { ...chat, lastMessageAt: message.createdAt } : chat,
       )
       state.currentChatMessages = getCurrentChatMessages(state.messagesByChatId, state.activeChatId)
+      state.activeChat = getActiveChat(state.chats, state.activeChatId)
       state.isLoading = false
       state.error = null
     },
-    sendMessageFailed(state, action: PayloadAction<string>) {
+    sendMessageFailed(state, action: PayloadAction<{ chatId: string; messageId: string; error: string }>) {
+      const { chatId, messageId, error } = action.payload
+      const currentMessages = state.messagesByChatId[chatId] ?? []
+      const failedMessage = currentMessages.find((message) => message.id === messageId)
+
+      state.messagesByChatId[chatId] = failedMessage?.content
+        ? currentMessages
+        : currentMessages.filter((message) => message.id !== messageId)
+      state.currentChatMessages = getCurrentChatMessages(state.messagesByChatId, state.activeChatId)
       state.isLoading = false
-      state.error = action.payload
+      state.error = error
     },
     clearError(state) {
       state.error = null
@@ -163,13 +206,17 @@ export const {
   sendMessageFailed,
   sendMessageStarted,
   sendMessageSucceeded,
+  updateAssistantMessage,
 } = chatSlice.actions
 
 export const sendMessage =
-  (text: string) => async (dispatch: AppDispatch, getState: () => RootState): Promise<void> => {
-    const { activeChatId, isLoading } = getState().chat
+  ({ text, apiKey, settings }: { text: string; apiKey: string; settings: ChatSettings }) =>
+  async (dispatch: AppDispatch, getState: () => RootState): Promise<void> => {
+    const { activeChatId, isLoading, messagesByChatId } = getState().chat
 
     if (!activeChatId || isLoading) return
+
+    const history = messagesByChatId[activeChatId] ?? []
 
     const userMessage: Message = {
       id: id('msg'),
@@ -179,22 +226,55 @@ export const sendMessage =
       createdAt: nowIso(),
     }
 
-    dispatch(sendMessageStarted({ chatId: activeChatId, message: userMessage }))
+    const assistantMessage: Message = {
+      id: id('msg'),
+      role: 'assistant',
+      author: ASSISTANT_AUTHOR,
+      content: '',
+      createdAt: nowIso(),
+    }
+
+    dispatch(sendMessageStarted({ chatId: activeChatId, userMessage, assistantMessage }))
 
     try {
-      await new Promise((resolve) => window.setTimeout(resolve, 1000 + Math.floor(Math.random() * 1000)))
+      let assistantContent = ''
 
-      const assistantMessage: Message = {
-        id: id('msg'),
-        role: 'assistant',
-        author: 'GigaChat',
-        content: buildMockAssistantReply(text),
-        createdAt: nowIso(),
-      }
+      await streamOpenAIChat(
+        {
+          apiKey,
+          model: settings.model,
+          maxTokens: settings.maxTokens,
+          messages: buildRequestMessages(settings, history, userMessage),
+        },
+        {
+          onChunk: (chunk) => {
+            assistantContent += chunk
+            dispatch(
+              updateAssistantMessage({
+                chatId: activeChatId,
+                messageId: assistantMessage.id,
+                content: assistantContent,
+              }),
+            )
+          },
+        },
+      )
 
-      dispatch(sendMessageSucceeded({ chatId: activeChatId, message: assistantMessage }))
-    } catch {
-      dispatch(sendMessageFailed('Не удалось получить ответ ассистента'))
+      dispatch(
+        sendMessageSucceeded({
+          chatId: activeChatId,
+          messageId: assistantMessage.id,
+          content: assistantContent,
+        }),
+      )
+    } catch (error) {
+      dispatch(
+        sendMessageFailed({
+          chatId: activeChatId,
+          messageId: assistantMessage.id,
+          error: getErrorMessage(error),
+        }),
+      )
     }
   }
 

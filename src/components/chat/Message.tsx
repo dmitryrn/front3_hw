@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import type { Message as ChatMessage } from '../../types'
+import TypingIndicator from './TypingIndicator'
 import { Avatar, Bubble, BubbleWrap, CopyButton, Markdown, Meta, Row } from './styles'
 
 type MessageProps = {
@@ -11,6 +12,7 @@ export default function Message({ message }: MessageProps) {
   const [isCopied, setIsCopied] = useState(false)
   const isUser = message.role === 'user'
   const variant = isUser ? 'user' : 'assistant'
+  const isPendingAssistantMessage = !isUser && !message.content
 
   useEffect(() => {
     if (!isCopied) return
@@ -36,13 +38,13 @@ export default function Message({ message }: MessageProps) {
       <BubbleWrap>
         <Meta>{message.author}</Meta>
         <Bubble $variant={variant}>
-          {!isUser ? (
+          {!isUser && !isPendingAssistantMessage ? (
             <CopyButton type="button" onClick={() => void copyToClipboard()}>
               {isCopied ? 'Скопировано' : 'Копировать'}
             </CopyButton>
           ) : null}
           <Markdown $variant={variant}>
-            <ReactMarkdown>{message.content}</ReactMarkdown>
+            {isPendingAssistantMessage ? <TypingIndicator isVisible /> : <ReactMarkdown>{message.content}</ReactMarkdown>}
           </Markdown>
         </Bubble>
       </BubbleWrap>

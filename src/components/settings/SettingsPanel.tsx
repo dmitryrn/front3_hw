@@ -48,10 +48,7 @@ export default function SettingsPanel({
               value={settings.model}
               onChange={(e) => onChangeSettings({ ...settings, model: e.target.value as ChatSettings['model'] })}
             >
-              <option value="GigaChat">GigaChat</option>
-              <option value="GigaChat-Plus">GigaChat-Plus</option>
-              <option value="GigaChat-Pro">GigaChat-Pro</option>
-              <option value="GigaChat-Max">GigaChat-Max</option>
+              <option value="gpt-5-mini">gpt-5-mini</option>
             </Select>
           </Row>
 

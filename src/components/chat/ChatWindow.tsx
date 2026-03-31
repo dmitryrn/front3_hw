@@ -43,7 +43,7 @@ export default function ChatWindow({
 
       {error ? <ErrorMessage message={error} /> : null}
 
-      {hasMessages ? <MessageList messages={messages} isLoading={isLoading} /> : <EmptyState />}
+      {hasMessages ? <MessageList messages={messages} /> : <EmptyState />}
 
       <InputArea isLoading={isLoading} onSend={onSendMessage} />
     </Window>
