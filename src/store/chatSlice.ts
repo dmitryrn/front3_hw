@@ -160,6 +160,7 @@ export const selectChats = (state: RootState) => state.chat.chats
 export const selectActiveChat = (state: RootState) => state.chat.activeChat
 export const selectActiveChatId = (state: RootState) => state.chat.activeChatId
 export const selectCurrentChatMessages = (state: RootState) => state.chat.currentChatMessages
+export const selectMessagesByChatId = (state: RootState) => state.chat.messagesByChatId
 export const selectChatLoading = (state: RootState) => state.chat.isLoading
 export const selectChatError = (state: RootState) => state.chat.error
 

@@ -15,7 +15,9 @@ import {
   selectChatLoading,
   selectChats,
   selectCurrentChatMessages,
+  selectMessagesByChatId,
   selectChat as selectChatAction,
+  editChatTitle,
   sendMessage,
 } from './store/chatSlice'
 import { useAppDispatch, useAppSelector } from './store/hooks'
@@ -43,6 +45,7 @@ export default function App() {
   const activeChat = useAppSelector(selectActiveChat)
   const activeChatId = useAppSelector(selectActiveChatId)
   const messages = useAppSelector(selectCurrentChatMessages)
+  const messagesByChatId = useAppSelector(selectMessagesByChatId)
   const isChatLoading = useAppSelector(selectChatLoading)
   const chatError = useAppSelector(selectChatError)
 
@@ -53,8 +56,11 @@ export default function App() {
   const visibleChats = useMemo(() => {
     const q = searchValue.trim().toLowerCase()
     if (!q) return chats
-    return chats.filter((c) => c.title.toLowerCase().includes(q))
-  }, [chats, searchValue])
+    return chats.filter((chat) => {
+      const lastMessage = messagesByChatId[chat.id]?.at(-1)?.content.toLowerCase() ?? ''
+      return chat.title.toLowerCase().includes(q) || lastMessage.includes(q)
+    })
+  }, [chats, messagesByChatId, searchValue])
 
   const openSidebar = () => setIsSidebarOpen(true)
   const closeSidebar = () => setIsSidebarOpen(false)
@@ -78,10 +84,7 @@ export default function App() {
 
   const onNewChat = () => dispatch(createChat())
 
-  const onEditChat = (chatId: string) => {
-    // mock handler
-    console.log('edit chat', chatId)
-  }
+  const onEditChat = (chatId: string, title: string) => dispatch(editChatTitle({ chatId, title }))
 
   const onDeleteChat = (chatId: string) => dispatch(deleteChat(chatId))
 

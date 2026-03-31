@@ -95,6 +95,16 @@ export const Title = styled.div`
   white-space: nowrap;
 `
 
+export const EditInput = styled.input`
+  width: 100%;
+  border: 1px solid rgba(43, 122, 106, 0.35);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border-radius: 10px;
+  padding: 6px 8px;
+  font: inherit;
+`
+
 export const Content = styled.div`
   min-width: 0;
 `
@@ -127,4 +137,41 @@ export const ActionBtn = styled.button`
   &:hover {
     border-color: rgba(43, 122, 106, 0.35);
   }
+`
+
+export const ConfirmOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 40;
+`
+
+export const ConfirmCard = styled.div`
+  width: min(420px, 100%);
+  padding: 20px;
+  border-radius: 18px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+`
+
+export const ConfirmTitle = styled.h3`
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: var(--color-text);
+`
+
+export const ConfirmText = styled.p`
+  margin: 0;
+  color: var(--color-muted);
+`
+
+export const ConfirmActions = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
 `

@@ -5,16 +5,26 @@ import { List } from './styles'
 type ChatListProps = {
   chats: Chat[]
   activeChatId: string
+  editingChatId: string | null
+  editingTitle: string
   onSelectChat: (id: string) => void
-  onEditChat: (id: string) => void
-  onDeleteChat: (id: string) => void
+  onStartEditChat: (chat: Chat) => void
+  onEditTitleChange: (value: string) => void
+  onSaveEditChat: () => void
+  onCancelEditChat: () => void
+  onDeleteChat: (chat: Chat) => void
 }
 
 export default function ChatList({
   chats,
   activeChatId,
+  editingChatId,
+  editingTitle,
   onSelectChat,
-  onEditChat,
+  onStartEditChat,
+  onEditTitleChange,
+  onSaveEditChat,
+  onCancelEditChat,
   onDeleteChat,
 }: ChatListProps) {
   return (
@@ -24,9 +34,14 @@ export default function ChatList({
           key={c.id}
           chat={c}
           active={c.id === activeChatId}
+          isEditing={c.id === editingChatId}
+          editingTitle={c.id === editingChatId ? editingTitle : ''}
           onSelect={() => onSelectChat(c.id)}
-          onEdit={() => onEditChat(c.id)}
-          onDelete={() => onDeleteChat(c.id)}
+          onEdit={() => onStartEditChat(c)}
+          onEditTitleChange={onEditTitleChange}
+          onSaveEdit={onSaveEditChat}
+          onCancelEdit={onCancelEditChat}
+          onDelete={() => onDeleteChat(c)}
         />
       ))}
     </List>
