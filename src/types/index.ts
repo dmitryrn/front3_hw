@@ -13,13 +13,35 @@ export type Chat = {
 
 export type MessageVariant = 'user' | 'assistant'
 
-export type ChatMessage = {
+export type Message = {
   id: string
   role: MessageVariant
   author: string
   content: string
   createdAt: string
 }
+
+export type ChatMessage = Message
+
+export type ChatState = {
+  chats: Chat[]
+  activeChat: Chat | null
+  activeChatId: string
+  currentChatMessages: Message[]
+  messagesByChatId: Record<string, Message[]>
+  isLoading: boolean
+  error: string | null
+}
+
+export type ChatAction =
+  | { type: 'chat/createChat' }
+  | { type: 'chat/selectChat'; payload: string }
+  | { type: 'chat/deleteChat'; payload: string }
+  | { type: 'chat/editChatTitle'; payload: { chatId: string; title: string } }
+  | { type: 'chat/sendMessageStarted'; payload: { chatId: string; message: Message } }
+  | { type: 'chat/sendMessageSucceeded'; payload: { chatId: string; message: Message } }
+  | { type: 'chat/sendMessageFailed'; payload: string }
+  | { type: 'chat/clearError' }
 
 export type ModelId = 'GigaChat' | 'GigaChat-Plus' | 'GigaChat-Pro' | 'GigaChat-Max'
 

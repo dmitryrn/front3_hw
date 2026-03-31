@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import type { ChatMessage } from '../../types'
+import type { Message as ChatMessage } from '../../types'
 import { Avatar, Bubble, BubbleWrap, CopyButton, Markdown, Meta, Row } from './styles'
 
 type MessageProps = {

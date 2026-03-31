@@ -1,4 +1,4 @@
-import type { Chat, ChatMessage, ChatSettings } from './types'
+import type { Chat, ChatSettings, Message } from './types'
 
 export const DEFAULT_SETTINGS: ChatSettings = {
   model: 'GigaChat',
@@ -16,7 +16,7 @@ export const MOCK_CHATS: Chat[] = [
   { id: 'c5', title: 'Черновик system prompt', lastMessageAt: '2026-03-05T12:20:00.000Z' },
 ]
 
-export const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
+export const MOCK_MESSAGES: Record<string, Message[]> = {
   c1: [
     {
       id: 'm1',

@@ -1,14 +1,16 @@
-import type { ChatMessage } from '../../types'
+import type { Message } from '../../types'
 import Button from '../ui/Button'
 import EmptyState from '../ui/EmptyState'
+import ErrorMessage from '../ui/ErrorMessage'
 import InputArea from './InputArea'
 import MessageList from './MessageList'
 import { BurgerButton, Header, Title, TitleRow, Window } from './styles'
 
 type ChatWindowProps = {
   chatTitle: string
-  messages: ChatMessage[]
+  messages: Message[]
   isLoading?: boolean
+  error?: string | null
   onOpenSidebar: () => void
   onOpenSettings: () => void
   onSendMessage: (text: string) => void
@@ -18,6 +20,7 @@ export default function ChatWindow({
   chatTitle,
   messages,
   isLoading,
+  error,
   onOpenSidebar,
   onOpenSettings,
   onSendMessage,
@@ -37,6 +40,8 @@ export default function ChatWindow({
           ⚙
         </Button>
       </Header>
+
+      {error ? <ErrorMessage message={error} /> : null}
 
       {hasMessages ? <MessageList messages={messages} isLoading={isLoading} /> : <EmptyState />}
 
