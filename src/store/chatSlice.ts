@@ -25,7 +25,7 @@ function getActiveChat(chats: Chat[], activeChatId: string) {
 
 const initialActiveChatId = MOCK_CHATS[0]?.id ?? ''
 
-const initialState: ChatState = {
+export const initialChatState: ChatState = {
   chats: MOCK_CHATS,
   activeChat: getActiveChat(MOCK_CHATS, initialActiveChatId),
   activeChatId: initialActiveChatId,
@@ -37,7 +37,7 @@ const initialState: ChatState = {
 
 const chatSlice = createSlice({
   name: 'chat',
-  initialState,
+  initialState: initialChatState,
   reducers: {
     createChat(state) {
       const newId = id('chat')
