@@ -1,6 +1,6 @@
 import type { ChangeEvent, KeyboardEvent, MouseEvent } from 'react'
-import type { Chat } from '../../types'
-import { ActionBtn, Actions, Content, EditInput, Item, Meta, Title } from './styles'
+import type { Chat } from '../../../types'
+import { ActionBtn, Actions, Content, EditInput, Item, Meta, Title } from '../styles'
 
 type ChatItemProps = {
   chat: Chat

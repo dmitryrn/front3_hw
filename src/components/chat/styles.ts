@@ -1,5 +1,5 @@
 import styled, { keyframes } from 'styled-components'
-import Button from '../ui/Button'
+import Button from '../ui/Button/Button'
 
 export const Window = styled.section`
   height: 100%;

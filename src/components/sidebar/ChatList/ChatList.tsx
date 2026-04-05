@@ -1,6 +1,6 @@
-import type { Chat } from '../../types'
-import ChatItem from './ChatItem'
-import { List } from './styles'
+import type { Chat } from '../../../types'
+import ChatItem from '../ChatItem/ChatItem'
+import { List } from '../styles'
 
 type ChatListProps = {
   chats: Chat[]

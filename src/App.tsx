@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes, useMatch, useNavigate } from 'react-router-dom'
 import type { ChatSettings, Theme } from './types'
-import AuthForm from './components/auth/AuthForm'
-import AppLayout from './components/layout/AppLayout'
-import Sidebar from './components/sidebar/Sidebar'
-import ChatWindow from './components/chat/ChatWindow'
-import SettingsPanel from './components/settings/SettingsPanel'
-import EmptyState from './components/ui/EmptyState'
+import AuthForm from './components/auth/AuthForm/AuthForm'
+import AppLayout from './components/layout/AppLayout/AppLayout'
+import Sidebar from './components/sidebar/Sidebar/Sidebar'
+import ChatWindow from './components/chat/ChatWindow/ChatWindow'
+import SettingsPanel from './components/settings/SettingsPanel/SettingsPanel'
+import EmptyState from './components/ui/EmptyState/EmptyState'
 import { DEFAULT_SETTINGS } from './mockData'
 import {
   createChat,

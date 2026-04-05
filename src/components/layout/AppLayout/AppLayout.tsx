@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Layout, Main } from './styles'
+import { Layout, Main } from '../styles'
 
 type AppLayoutProps = {
   sidebar: ReactNode

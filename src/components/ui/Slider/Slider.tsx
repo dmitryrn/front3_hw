@@ -1,4 +1,4 @@
-import { FieldLabel, SliderInput, SliderRow } from './styles'
+import { FieldLabel, SliderInput, SliderRow } from '../styles'
 
 type SliderProps = {
   label: string

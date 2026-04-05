@@ -1,4 +1,4 @@
-import { Dot, Typing } from './styles'
+import { Dot, Typing } from '../styles'
 
 type TypingIndicatorProps = {
   isVisible?: boolean

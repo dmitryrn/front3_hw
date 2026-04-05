@@ -1,7 +1,7 @@
-import Button from '../ui/Button'
-import ErrorMessage from '../ui/ErrorMessage'
-import { FieldLabel, Input } from '../ui/styles'
-import { Actions, Card, Grid, Subtitle, Title, Wrap } from './styles'
+import Button from '../../ui/Button/Button'
+import ErrorMessage from '../../ui/ErrorMessage/ErrorMessage'
+import { FieldLabel, Input } from '../../ui/styles'
+import { Actions, Card, Grid, Subtitle, Title, Wrap } from '../styles'
 
 type AuthFormProps = {
   apiKey: string

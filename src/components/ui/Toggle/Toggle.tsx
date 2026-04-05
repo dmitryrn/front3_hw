@@ -1,4 +1,4 @@
-import { ToggleInput, ToggleThumb, ToggleTrack, ToggleWrap } from './styles'
+import { ToggleInput, ToggleThumb, ToggleTrack, ToggleWrap } from '../styles'
 
 type ToggleProps = {
   checked: boolean

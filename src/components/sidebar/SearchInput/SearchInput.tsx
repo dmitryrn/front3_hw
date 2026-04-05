@@ -1,4 +1,4 @@
-import { Input } from '../ui/styles'
+import { Input } from '../../ui/styles'
 
 type SearchInputProps = {
   value: string

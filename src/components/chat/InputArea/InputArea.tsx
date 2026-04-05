@@ -1,7 +1,7 @@
 import type { RefObject } from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import Button from '../ui/Button'
-import { Buttons, Composer, InputWrap, Textarea } from './styles'
+import Button from '../../ui/Button/Button'
+import { Buttons, Composer, InputWrap, Textarea } from '../styles'
 
 type InputAreaProps = {
   isLoading?: boolean

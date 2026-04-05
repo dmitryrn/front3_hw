@@ -1,10 +1,10 @@
-import type { Message } from '../../types'
-import Button from '../ui/Button'
-import EmptyState from '../ui/EmptyState'
-import ErrorMessage from '../ui/ErrorMessage'
-import InputArea from './InputArea'
-import MessageList from './MessageList'
-import { BurgerButton, Header, Title, TitleRow, Window } from './styles'
+import type { Message } from '../../../types'
+import Button from '../../ui/Button/Button'
+import EmptyState from '../../ui/EmptyState/EmptyState'
+import ErrorMessage from '../../ui/ErrorMessage/ErrorMessage'
+import InputArea from '../InputArea/InputArea'
+import MessageList from '../MessageList/MessageList'
+import { BurgerButton, Header, Title, TitleRow, Window } from '../styles'
 
 type ChatWindowProps = {
   chatTitle: string

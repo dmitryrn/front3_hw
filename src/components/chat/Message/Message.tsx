@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import type { Message as ChatMessage } from '../../types'
-import TypingIndicator from './TypingIndicator'
-import { Avatar, Bubble, BubbleWrap, CopyButton, Markdown, Meta, Row } from './styles'
+import type { Message as ChatMessage } from '../../../types'
+import TypingIndicator from '../TypingIndicator/TypingIndicator'
+import { Avatar, Bubble, BubbleWrap, CopyButton, Markdown, Meta, Row } from '../styles'
 
 type MessageProps = {
   message: ChatMessage

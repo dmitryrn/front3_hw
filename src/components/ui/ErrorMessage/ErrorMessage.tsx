@@ -1,4 +1,4 @@
-import { Error, ErrorIcon } from './styles'
+import { Error, ErrorIcon } from '../styles'
 
 type ErrorMessageProps = {
   message: string

@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import type { Chat } from '../../types'
-import Button from '../ui/Button'
-import SearchInput from './SearchInput'
-import ChatList from './ChatList'
+import type { Chat } from '../../../types'
+import Button from '../../ui/Button/Button'
+import SearchInput from '../SearchInput/SearchInput'
+import ChatList from '../ChatList/ChatList'
 import {
   ConfirmActions,
   ConfirmCard,
@@ -14,7 +14,7 @@ import {
   Plus,
   SidebarAside,
   Top,
-} from './styles'
+} from '../styles'
 
 type SidebarProps = {
   isOpen: boolean

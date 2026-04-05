@@ -1,4 +1,4 @@
-import { Empty, EmptyCard, EmptyText, EmptyTitle } from './styles'
+import { Empty, EmptyCard, EmptyText, EmptyTitle } from '../styles'
 
 type EmptyStateProps = {
   title?: string

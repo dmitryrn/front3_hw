@@ -1,9 +1,9 @@
-import type { ChatSettings, Theme } from '../../types'
-import Button from '../ui/Button'
-import Slider from '../ui/Slider'
-import Toggle from '../ui/Toggle'
-import { FieldLabel, Input, Select, Textarea } from '../ui/styles'
-import { Actions, Body, Head, Overlay, Panel, Row, Title } from './styles'
+import type { ChatSettings, Theme } from '../../../types'
+import Button from '../../ui/Button/Button'
+import Slider from '../../ui/Slider/Slider'
+import Toggle from '../../ui/Toggle/Toggle'
+import { FieldLabel, Input, Select, Textarea } from '../../ui/styles'
+import { Actions, Body, Head, Overlay, Panel, Row, Title } from '../styles'
 
 type SettingsPanelProps = {
   isOpen: boolean

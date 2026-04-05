@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
-import type { Message as ChatMessage } from '../../types'
-import Message from './Message'
-import { Messages, Stack } from './styles'
+import type { Message as ChatMessage } from '../../../types'
+import Message from '../Message/Message'
+import { Messages, Stack } from '../styles'
 
 type MessageListProps = {
   messages: ChatMessage[]
