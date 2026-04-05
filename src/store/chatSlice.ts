@@ -83,10 +83,11 @@ export const initialChatState: ChatState = {
   error: null,
 }
 
-const chatSlice = createSlice({
-  name: 'chat',
-  initialState: initialChatState,
-  reducers: {
+export function createChatSlice(initialState: ChatState) {
+  return createSlice({
+    name: 'chat',
+    initialState,
+    reducers: {
     createChat: {
       reducer(state, action: PayloadAction<{ id: string }>) {
         const newId = action.payload.id
@@ -194,8 +195,11 @@ const chatSlice = createSlice({
     clearError(state) {
       state.error = null
     },
-  },
-})
+    },
+  })
+}
+
+const chatSlice = createChatSlice(initialChatState)
 
 export const {
   clearError,
