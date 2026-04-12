@@ -36,6 +36,52 @@ Bundle visualization from `vite-bundle-visualizer`:
 
 ![Bundle visualization](./bundle-stats.png)
 
+## Deploy
+
+The app is configured for Vercel with a server-side proxy function at `api/chat.ts`.
+
+Required environment variable:
+
+```bash
+OPENAI_API_KEY=your_server_side_key
+```
+
+Important:
+- do not expose the OpenAI key via `VITE_*` variables
+- the browser calls `/api/chat`, and only the Vercel function talks to OpenAI
+
+## Deploy to Vercel
+
+1. Install the Vercel CLI if needed:
+
+```bash
+npm i -g vercel
+```
+
+2. Log in and link the project:
+
+```bash
+vercel
+```
+
+3. Add the server-side OpenAI key in Vercel:
+
+```bash
+vercel env add OPENAI_API_KEY
+```
+
+4. Deploy to production:
+
+```bash
+vercel --prod
+```
+
+Notes:
+- `vercel.json` already contains SPA routing fallback for React Router
+- local example env is documented in `.env.example`
+- after deployment, open `/chat/<id>` directly to confirm router rewrites work
+- also test the deployed app in an incognito window to verify clean first-run behavior
+
 ### Test Coverage
 
 **InputArea** (`src/components/chat/InputArea/`)

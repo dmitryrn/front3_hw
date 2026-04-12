@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import { streamOpenAIChat } from '../api/openai'
+import { requestOpenAIChat } from '../api/openai'
 import type { AppDispatch, RootState } from './index'
 import { MOCK_CHATS, MOCK_MESSAGES } from '../mockData'
 import type { Chat, ChatAction, ChatSettings, ChatState, Message } from '../types'
@@ -221,7 +221,7 @@ export const {
 } = chatSlice.actions
 
 export const sendMessage =
-  ({ text, apiKey, settings }: { text: string; apiKey: string; settings: ChatSettings }) =>
+  ({ text, settings }: { text: string; settings: ChatSettings }) =>
   async (dispatch: AppDispatch, getState: () => RootState): Promise<void> => {
     const { activeChatId, isLoading, messagesByChatId } = getState().chat
 
@@ -248,27 +248,19 @@ export const sendMessage =
     dispatch(sendMessageStarted({ chatId: activeChatId, userMessage, assistantMessage }))
 
     try {
-      let assistantContent = ''
+      const response = await requestOpenAIChat({
+        model: settings.model,
+        maxTokens: settings.maxTokens,
+        messages: buildRequestMessages(settings, history, userMessage),
+      })
+      const assistantContent = response.content.trim()
 
-      await streamOpenAIChat(
-        {
-          apiKey,
-          model: settings.model,
-          maxTokens: settings.maxTokens,
-          messages: buildRequestMessages(settings, history, userMessage),
-        },
-        {
-          onChunk: (chunk) => {
-            assistantContent += chunk
-            dispatch(
-              updateAssistantMessage({
-                chatId: activeChatId,
-                messageId: assistantMessage.id,
-                content: assistantContent,
-              }),
-            )
-          },
-        },
+      dispatch(
+        updateAssistantMessage({
+          chatId: activeChatId,
+          messageId: assistantMessage.id,
+          content: assistantContent,
+        }),
       )
 
       dispatch(

@@ -1,7 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes, useMatch, useNavigate } from 'react-router-dom'
 import type { ChatSettings, Theme } from './types'
-import AuthForm from './components/auth/AuthForm/AuthForm'
 import AppLayout from './components/layout/AppLayout/AppLayout'
 import { DEFAULT_SETTINGS } from './mockData'
 import {
@@ -45,10 +44,6 @@ export default function App() {
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
-  const [isAuthed, setIsAuthed] = useState(false)
-  const [apiKey, setApiKey] = useState('')
-  const [authError, setAuthError] = useState<string | null>(null)
-
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
 
@@ -86,21 +81,6 @@ export default function App() {
   const openSettings = useCallback(() => setIsSettingsOpen(true), [])
   const closeSettings = useCallback(() => setIsSettingsOpen(false), [])
 
-  const onApiKeyChange = useCallback((value: string) => {
-    setApiKey(value)
-    if (authError) setAuthError(null)
-  }, [authError])
-
-  const onAuthSubmit = useCallback(() => {
-    if (!apiKey.trim()) {
-      setAuthError('Поле OpenAI API Key не должно быть пустым')
-      return
-    }
-
-    setAuthError(null)
-    setIsAuthed(true)
-  }, [apiKey])
-
   const onNewChat = useCallback(() => {
     const action = dispatch(createChat())
     navigate(`/chat/${action.payload.id}`)
@@ -120,13 +100,13 @@ export default function App() {
   }, [dispatch, navigate, routeChatId])
 
   const onSendMessage = useCallback((text: string) => {
-    void dispatch(sendMessage({ text, apiKey, settings }))
-  }, [apiKey, dispatch, settings])
+    void dispatch(sendMessage({ text, settings }))
+  }, [dispatch, settings])
 
   const onRetryMessage = useCallback(() => {
     if (!lastFailedPrompt) return
-    void dispatch(sendMessage({ text: lastFailedPrompt, apiKey, settings }))
-  }, [apiKey, dispatch, lastFailedPrompt, settings])
+    void dispatch(sendMessage({ text: lastFailedPrompt, settings }))
+  }, [dispatch, lastFailedPrompt, settings])
 
   const onResetSettings = useCallback(() => {
     setSettings(DEFAULT_SETTINGS)
@@ -134,12 +114,6 @@ export default function App() {
   }, [])
 
   const handleSelectChat = useCallback((chatId: string) => navigate(`/chat/${chatId}`), [navigate])
-
-  if (!isAuthed) {
-    return (
-      <AuthForm apiKey={apiKey} error={authError} onApiKeyChange={onApiKeyChange} onSubmit={onAuthSubmit} />
-    )
-  }
 
   return (
     <>
