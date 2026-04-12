@@ -1,12 +1,8 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes, useMatch, useNavigate } from 'react-router-dom'
 import type { ChatSettings, Theme } from './types'
 import AuthForm from './components/auth/AuthForm/AuthForm'
 import AppLayout from './components/layout/AppLayout/AppLayout'
-import Sidebar from './components/sidebar/Sidebar/Sidebar'
-import ChatWindow from './components/chat/ChatWindow/ChatWindow'
-import SettingsPanel from './components/settings/SettingsPanel/SettingsPanel'
-import EmptyState from './components/ui/EmptyState/EmptyState'
 import { DEFAULT_SETTINGS } from './mockData'
 import {
   createChat,
@@ -21,6 +17,23 @@ import {
   sendMessage,
 } from './store/chatSlice'
 import { useAppDispatch, useAppSelector } from './store/hooks'
+
+const Sidebar = lazy(() => import('./components/sidebar/Sidebar/Sidebar'))
+const SettingsPanel = lazy(() => import('./components/settings/SettingsPanel/SettingsPanel'))
+const HomeRoute = lazy(() => import('./routes/HomeRoute'))
+const ChatRoute = lazy(() => import('./routes/ChatRoute'))
+
+function SidebarFallback() {
+  return <aside aria-hidden>Загрузка боковой панели...</aside>
+}
+
+function PanelFallback() {
+  return null
+}
+
+function RouteFallback() {
+  return <div>Загрузка...</div>
+}
 
 export default function App() {
   const dispatch = useAppDispatch()
@@ -123,63 +136,61 @@ export default function App() {
 
   return (
     <>
-      <AppLayout
-        sidebar={
-          <Sidebar
-            isOpen={isSidebarOpen}
-            onClose={closeSidebar}
-            searchValue={searchValue}
-            onSearchChange={setSearchValue}
-            chats={visibleChats}
-            activeChatId={sidebarActiveChatId}
-            onNewChat={onNewChat}
-            onSelectChat={handleSelectChat}
-            onEditChat={onEditChat}
-            onDeleteChat={onDeleteChat}
-          />
-        }
-        chat={
-          <Routes>
-            <Route
-              path="/"
-              element={<EmptyState title="Выберите чат" text="Откройте существующий чат слева или создайте новый." />}
-            />
-            <Route
-              path="/chat/:id"
-              element={
-                routedChat ? (
-                  <ChatWindow
-                    chatTitle={routedChat.title}
-                    messages={routedMessages}
-                    isLoading={isChatLoading}
-                    error={chatError}
-                    onOpenSidebar={openSidebar}
-                    onOpenSettings={openSettings}
-                    onSendMessage={onSendMessage}
-                  />
-                ) : (
-                  <EmptyState
-                    title="Чат не найден"
-                    text="Проверьте адрес или выберите другой чат в боковой панели."
-                  />
-                )
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        }
-      />
+        <AppLayout
+          sidebar={
+            <Suspense fallback={<SidebarFallback />}>
+              <Sidebar
+                isOpen={isSidebarOpen}
+                onClose={closeSidebar}
+                searchValue={searchValue}
+                onSearchChange={setSearchValue}
+                chats={visibleChats}
+                activeChatId={sidebarActiveChatId}
+                onNewChat={onNewChat}
+                onSelectChat={handleSelectChat}
+                onEditChat={onEditChat}
+                onDeleteChat={onDeleteChat}
+              />
+            </Suspense>
+          }
+          chat={
+            <Suspense fallback={<RouteFallback />}>
+              <Routes>
+                <Route path="/" element={<HomeRoute />} />
+                <Route
+                  path="/chat/:id"
+                  element={
+                    <ChatRoute
+                      chat={routedChat}
+                      messages={routedMessages}
+                      isLoading={isChatLoading}
+                      error={chatError}
+                      onOpenSidebar={openSidebar}
+                      onOpenSettings={openSettings}
+                      onSendMessage={onSendMessage}
+                    />
+                  }
+                />
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+          }
+        />
 
-      <SettingsPanel
-        isOpen={isSettingsOpen}
-        settings={settings}
-        theme={theme}
-        onClose={closeSettings}
-        onChangeSettings={setSettings}
-        onChangeTheme={setTheme}
-        onSave={closeSettings}
-        onReset={onResetSettings}
-      />
+      <Suspense fallback={<PanelFallback />}>
+        {isSettingsOpen ? (
+          <SettingsPanel
+            isOpen={isSettingsOpen}
+            settings={settings}
+            theme={theme}
+            onClose={closeSettings}
+            onChangeSettings={setSettings}
+            onChangeTheme={setTheme}
+            onSave={closeSettings}
+            onReset={onResetSettings}
+          />
+        ) : null}
+      </Suspense>
     </>
   )
 }
