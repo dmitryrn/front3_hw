@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react
 import { Navigate, Route, Routes, useMatch, useNavigate } from 'react-router-dom'
 import type { ChatSettings, Theme } from './types'
 import AppLayout from './components/layout/AppLayout/AppLayout'
-import { DEFAULT_SETTINGS } from './mockData'
+import { DEFAULT_SETTINGS } from './settings'
 import {
   createChat,
   deleteChat,

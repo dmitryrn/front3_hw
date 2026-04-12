@@ -1,7 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
 import { streamOpenAIChat } from '../api/openai'
 import type { AppDispatch, RootState } from './index'
-import { MOCK_CHATS, MOCK_MESSAGES } from '../mockData'
 import type { Chat, ChatAction, ChatSettings, ChatState, Message } from '../types'
 
 function nowIso() {
@@ -71,14 +70,14 @@ function getActiveChat(chats: Chat[], activeChatId: string) {
   return chats.find((chat) => chat.id === activeChatId) ?? null
 }
 
-const initialActiveChatId = MOCK_CHATS[0]?.id ?? ''
+const initialActiveChatId = ''
 
 export const initialChatState: ChatState = {
-  chats: MOCK_CHATS,
-  activeChat: getActiveChat(MOCK_CHATS, initialActiveChatId),
+  chats: [],
+  activeChat: null,
   activeChatId: initialActiveChatId,
-  currentChatMessages: getCurrentChatMessages(MOCK_MESSAGES, initialActiveChatId),
-  messagesByChatId: MOCK_MESSAGES,
+  currentChatMessages: [],
+  messagesByChatId: {},
   isLoading: false,
   error: null,
   lastFailedPrompt: null,
