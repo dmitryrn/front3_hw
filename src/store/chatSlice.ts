@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import { requestOpenAIChat } from '../api/openai'
+import { streamOpenAIChat } from '../api/openai'
 import type { AppDispatch, RootState } from './index'
 import { MOCK_CHATS, MOCK_MESSAGES } from '../mockData'
 import type { Chat, ChatAction, ChatSettings, ChatState, Message } from '../types'
@@ -248,19 +248,26 @@ export const sendMessage =
     dispatch(sendMessageStarted({ chatId: activeChatId, userMessage, assistantMessage }))
 
     try {
-      const response = await requestOpenAIChat({
-        model: settings.model,
-        maxTokens: settings.maxTokens,
-        messages: buildRequestMessages(settings, history, userMessage),
-      })
-      const assistantContent = response.content.trim()
+      let assistantContent = ''
 
-      dispatch(
-        updateAssistantMessage({
-          chatId: activeChatId,
-          messageId: assistantMessage.id,
-          content: assistantContent,
-        }),
+      await streamOpenAIChat(
+        {
+          model: settings.model,
+          maxTokens: settings.maxTokens,
+          messages: buildRequestMessages(settings, history, userMessage),
+        },
+        {
+          onChunk: (chunk) => {
+            assistantContent += chunk
+            dispatch(
+              updateAssistantMessage({
+                chatId: activeChatId,
+                messageId: assistantMessage.id,
+                content: assistantContent,
+              }),
+            )
+          },
+        },
       )
 
       dispatch(
@@ -271,6 +278,7 @@ export const sendMessage =
         }),
       )
     } catch (error) {
+      console.error('Failed to send message', error)
       dispatch(
         sendMessageFailed({
           chatId: activeChatId,

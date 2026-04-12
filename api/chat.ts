@@ -30,24 +30,35 @@ export default async function handler(req: any, res: any) {
         model,
         messages,
         max_completion_tokens: maxTokens,
+        stream: true,
       }),
     })
 
-    const payload = await response.json().catch(() => null)
-
     if (!response.ok) {
+      const payload = await response.json().catch(() => null)
       const message = payload?.error?.message || 'Failed to fetch OpenAI response'
       res.status(response.status).send(message)
       return
     }
 
-    const content = payload?.choices?.[0]?.message?.content
-    if (typeof content !== 'string' || !content.trim()) {
+    if (!response.body) {
       res.status(502).send('OpenAI returned an empty response')
       return
     }
 
-    res.status(200).json({ content })
+    res.setHeader('Content-Type', 'text/event-stream; charset=utf-8')
+    res.setHeader('Cache-Control', 'no-cache, no-transform')
+    res.setHeader('Connection', 'keep-alive')
+
+    const reader = response.body.getReader()
+
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      res.write(Buffer.from(value))
+    }
+
+    res.end()
   } catch (error) {
     res.status(500).send(getErrorMessage(error))
   }
