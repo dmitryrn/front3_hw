@@ -35,19 +35,20 @@ function makeState(overrides: Partial<ChatState> = {}): ChatState {
   const firstMessages = [makeMessage('msg-1', 'user', 'Привет')]
   const secondMessages = [makeMessage('msg-2', 'assistant', 'Здравствуйте')]
 
-  return {
-    chats: [firstChat, secondChat],
-    activeChat: firstChat,
+    return {
+      chats: [firstChat, secondChat],
+      activeChat: firstChat,
     activeChatId: firstChat.id,
     currentChatMessages: firstMessages,
     messagesByChatId: {
       [firstChat.id]: firstMessages,
       [secondChat.id]: secondMessages,
-    },
-    isLoading: false,
-    error: null,
-    ...overrides,
-  }
+      },
+      isLoading: false,
+      error: null,
+      lastFailedPrompt: null,
+      ...overrides,
+    }
 }
 
 function makeReducer(initialState: ChatState) {
@@ -86,6 +87,7 @@ describe('chatSlice reducer', () => {
         'chat-3': [],
       },
       error: null,
+      lastFailedPrompt: null,
     })
   })
 
@@ -106,6 +108,7 @@ describe('chatSlice reducer', () => {
       },
       isLoading: false,
       error: null,
+      lastFailedPrompt: null,
     })
   })
 
@@ -134,6 +137,7 @@ describe('chatSlice reducer', () => {
       currentChatMessages: [],
       messagesByChatId: {},
       isLoading: false,
+      lastFailedPrompt: null,
     })
   })
 
@@ -201,6 +205,7 @@ describe('chatSlice reducer', () => {
       },
       isLoading: true,
       error: null,
+      lastFailedPrompt: null,
     })
   })
 
@@ -240,6 +245,7 @@ describe('chatSlice reducer', () => {
       },
       isLoading: false,
       error: null,
+      lastFailedPrompt: null,
     })
   })
 
@@ -261,12 +267,13 @@ describe('chatSlice reducer', () => {
 
     const nextState = reducer(
       undefined,
-      sendMessageFailed({
-        chatId: 'chat-1',
-        messageId: 'msg-assistant',
-        error: 'Network error',
-      }),
-    )
+        sendMessageFailed({
+          chatId: 'chat-1',
+          messageId: 'msg-assistant',
+          error: 'Network error',
+          failedText: 'Привет',
+        }),
+      )
 
     expect(nextState).toEqual({
       ...initialState,
@@ -276,6 +283,7 @@ describe('chatSlice reducer', () => {
       },
       isLoading: false,
       error: 'Network error',
+      lastFailedPrompt: 'Привет',
     })
   })
 })

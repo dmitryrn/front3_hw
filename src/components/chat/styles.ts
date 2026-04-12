@@ -237,6 +237,10 @@ export const InputWrap = styled.div`
   }
 `
 
+export const InputError = styled.div`
+  margin-top: 10px;
+`
+
 export const Composer = styled.div`
   display: grid;
   grid-template-columns: 1fr auto;

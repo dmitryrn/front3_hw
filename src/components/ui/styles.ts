@@ -95,6 +95,7 @@ export const Textarea = styled.textarea`
 
 export const Error = styled.div`
   display: inline-flex;
+  flex-wrap: wrap;
   gap: 8px;
   align-items: center;
   padding: 10px 12px;

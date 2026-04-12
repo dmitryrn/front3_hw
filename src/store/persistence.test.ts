@@ -24,6 +24,7 @@ describe('persistence', () => {
       messagesByChatId: {},
       isLoading: false,
       error: null,
+      lastFailedPrompt: null,
     }
 
     saveChatState(state)
@@ -41,6 +42,7 @@ describe('persistence', () => {
       messagesByChatId: { 'chat-1': [] },
       isLoading: false,
       error: null,
+      lastFailedPrompt: null,
     }
     storage['chat-state'] = JSON.stringify(state)
 

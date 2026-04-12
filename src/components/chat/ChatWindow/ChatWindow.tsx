@@ -1,19 +1,22 @@
 import type { Message } from '../../../types'
 import Button from '../../ui/Button/Button'
+import ErrorBoundary from '../../ui/ErrorBoundary/ErrorBoundary'
 import EmptyState from '../../ui/EmptyState/EmptyState'
 import ErrorMessage from '../../ui/ErrorMessage/ErrorMessage'
 import InputArea from '../InputArea/InputArea'
 import MessageList from '../MessageList/MessageList'
-import { BurgerButton, Header, Title, TitleRow, Window } from '../styles'
+import { BurgerButton, Header, InputError, Messages, Title, TitleRow, Window } from '../styles'
 
 type ChatWindowProps = {
   chatTitle: string
   messages: Message[]
   isLoading?: boolean
   error?: string | null
+  canRetry?: boolean
   onOpenSidebar: () => void
   onOpenSettings: () => void
   onSendMessage: (text: string) => void
+  onRetryMessage: () => void
 }
 
 export default function ChatWindow({
@@ -21,9 +24,11 @@ export default function ChatWindow({
   messages,
   isLoading,
   error,
+  canRetry = false,
   onOpenSidebar,
   onOpenSettings,
   onSendMessage,
+  onRetryMessage,
 }: ChatWindowProps) {
   const hasMessages = messages.length > 0
 
@@ -41,11 +46,24 @@ export default function ChatWindow({
         </Button>
       </Header>
 
-      {error ? <ErrorMessage message={error} /> : null}
-
-      {hasMessages ? <MessageList messages={messages} /> : <EmptyState />}
+      <ErrorBoundary
+        resetKey={`${chatTitle}:${messages.length}`}
+        fallback={
+          <Messages>
+            <ErrorMessage message="Не удалось отрисовать сообщения. Откройте другой чат или попробуйте снова позже." />
+          </Messages>
+        }
+      >
+        {hasMessages ? <MessageList messages={messages} /> : <EmptyState />}
+      </ErrorBoundary>
 
       <InputArea isLoading={isLoading} onSend={onSendMessage} />
+
+      {error ? (
+        <InputError>
+          <ErrorMessage message={error} actionLabel={canRetry ? 'Повторить' : undefined} onAction={canRetry ? onRetryMessage : undefined} />
+        </InputError>
+      ) : null}
     </Window>
   )
 }

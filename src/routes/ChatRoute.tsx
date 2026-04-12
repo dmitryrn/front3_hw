@@ -7,9 +7,11 @@ type ChatRouteProps = {
   messages: Message[]
   isLoading?: boolean
   error?: string | null
+  canRetry?: boolean
   onOpenSidebar: () => void
   onOpenSettings: () => void
   onSendMessage: (text: string) => void
+  onRetryMessage: () => void
 }
 
 export default function ChatRoute({
@@ -17,9 +19,11 @@ export default function ChatRoute({
   messages,
   isLoading,
   error,
+  canRetry,
   onOpenSidebar,
   onOpenSettings,
   onSendMessage,
+  onRetryMessage,
 }: ChatRouteProps) {
   if (!chat) {
     return <EmptyState title="Чат не найден" text="Проверьте адрес или выберите другой чат в боковой панели." />
@@ -31,9 +35,11 @@ export default function ChatRoute({
       messages={messages}
       isLoading={isLoading}
       error={error}
+      canRetry={canRetry}
       onOpenSidebar={onOpenSidebar}
       onOpenSettings={onOpenSettings}
       onSendMessage={onSendMessage}
+      onRetryMessage={onRetryMessage}
     />
   )
 }

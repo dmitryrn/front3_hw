@@ -10,6 +10,7 @@ import {
   selectActiveChatId,
   selectChatError,
   selectChatLoading,
+  selectLastFailedPrompt,
   selectChats,
   selectMessagesByChatId,
   selectChat as selectChatAction,
@@ -56,6 +57,7 @@ export default function App() {
   const messagesByChatId = useAppSelector(selectMessagesByChatId)
   const isChatLoading = useAppSelector(selectChatLoading)
   const chatError = useAppSelector(selectChatError)
+  const lastFailedPrompt = useAppSelector(selectLastFailedPrompt)
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -121,6 +123,11 @@ export default function App() {
     void dispatch(sendMessage({ text, apiKey, settings }))
   }, [apiKey, dispatch, settings])
 
+  const onRetryMessage = useCallback(() => {
+    if (!lastFailedPrompt) return
+    void dispatch(sendMessage({ text: lastFailedPrompt, apiKey, settings }))
+  }, [apiKey, dispatch, lastFailedPrompt, settings])
+
   const onResetSettings = useCallback(() => {
     setSettings(DEFAULT_SETTINGS)
     setTheme('light')
@@ -165,9 +172,11 @@ export default function App() {
                       messages={routedMessages}
                       isLoading={isChatLoading}
                       error={chatError}
+                      canRetry={Boolean(lastFailedPrompt)}
                       onOpenSidebar={openSidebar}
                       onOpenSettings={openSettings}
                       onSendMessage={onSendMessage}
+                      onRetryMessage={onRetryMessage}
                     />
                   }
                 />

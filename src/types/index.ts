@@ -26,6 +26,7 @@ export type ChatState = {
   messagesByChatId: Record<string, Message[]>
   isLoading: boolean
   error: string | null
+  lastFailedPrompt: string | null
 }
 
 export type ChatAction =
@@ -36,7 +37,7 @@ export type ChatAction =
   | { type: 'chat/sendMessageStarted'; payload: { chatId: string; userMessage: Message; assistantMessage: Message } }
   | { type: 'chat/updateAssistantMessage'; payload: { chatId: string; messageId: string; content: string } }
   | { type: 'chat/sendMessageSucceeded'; payload: { chatId: string; messageId: string; content: string } }
-  | { type: 'chat/sendMessageFailed'; payload: { chatId: string; messageId: string; error: string } }
+  | { type: 'chat/sendMessageFailed'; payload: { chatId: string; messageId: string; error: string; failedText: string } }
   | { type: 'chat/clearError' }
 
 export type ModelId = 'gpt-5-mini'

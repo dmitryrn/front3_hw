@@ -81,6 +81,7 @@ export const initialChatState: ChatState = {
   messagesByChatId: MOCK_MESSAGES,
   isLoading: false,
   error: null,
+  lastFailedPrompt: null,
 }
 
 export function createChatSlice(initialState: ChatState) {
@@ -101,9 +102,10 @@ export function createChatSlice(initialState: ChatState) {
         state.messagesByChatId[newId] = []
         state.activeChat = newChat
         state.activeChatId = newId
-        state.currentChatMessages = []
-        state.error = null
-      },
+         state.currentChatMessages = []
+         state.error = null
+         state.lastFailedPrompt = null
+       },
       prepare() {
         return { payload: { id: id('chat') } }
       },
@@ -113,6 +115,7 @@ export function createChatSlice(initialState: ChatState) {
       state.activeChat = getActiveChat(state.chats, action.payload)
       state.currentChatMessages = getCurrentChatMessages(state.messagesByChatId, action.payload)
       state.error = null
+      state.lastFailedPrompt = null
     },
     deleteChat(state, action: PayloadAction<string>) {
       const chatId = action.payload
@@ -133,6 +136,7 @@ export function createChatSlice(initialState: ChatState) {
       }
 
       state.error = null
+      state.lastFailedPrompt = null
     },
     editChatTitle(state, action: PayloadAction<{ chatId: string; title: string }>) {
       const { chatId, title } = action.payload
@@ -158,6 +162,7 @@ export function createChatSlice(initialState: ChatState) {
       state.activeChat = getActiveChat(state.chats, state.activeChatId)
       state.isLoading = true
       state.error = null
+      state.lastFailedPrompt = null
     },
     updateAssistantMessage(state, action: PayloadAction<{ chatId: string; messageId: string; content: string }>) {
       const { chatId, messageId, content } = action.payload
@@ -180,8 +185,8 @@ export function createChatSlice(initialState: ChatState) {
       state.isLoading = false
       state.error = null
     },
-    sendMessageFailed(state, action: PayloadAction<{ chatId: string; messageId: string; error: string }>) {
-      const { chatId, messageId, error } = action.payload
+    sendMessageFailed(state, action: PayloadAction<{ chatId: string; messageId: string; error: string; failedText: string }>) {
+      const { chatId, messageId, error, failedText } = action.payload
       const currentMessages = state.messagesByChatId[chatId] ?? []
       const failedMessage = currentMessages.find((message) => message.id === messageId)
 
@@ -191,9 +196,11 @@ export function createChatSlice(initialState: ChatState) {
       state.currentChatMessages = getCurrentChatMessages(state.messagesByChatId, state.activeChatId)
       state.isLoading = false
       state.error = error
+      state.lastFailedPrompt = failedText
     },
     clearError(state) {
       state.error = null
+      state.lastFailedPrompt = null
     },
     },
   })
@@ -277,6 +284,7 @@ export const sendMessage =
           chatId: activeChatId,
           messageId: assistantMessage.id,
           error: getErrorMessage(error),
+          failedText: text,
         }),
       )
     }
@@ -290,6 +298,7 @@ export const selectCurrentChatMessages = (state: RootState) => state.chat.curren
 export const selectMessagesByChatId = (state: RootState) => state.chat.messagesByChatId
 export const selectChatLoading = (state: RootState) => state.chat.isLoading
 export const selectChatError = (state: RootState) => state.chat.error
+export const selectLastFailedPrompt = (state: RootState) => state.chat.lastFailedPrompt
 
 export type ChatSliceAction = ChatAction
 

@@ -9,7 +9,17 @@ export function loadChatState(): ChatState | undefined {
   if (!raw) return undefined
 
   try {
-    return JSON.parse(raw) as ChatState
+    const parsed = JSON.parse(raw) as Partial<ChatState>
+    return {
+      chats: parsed.chats ?? [],
+      activeChat: parsed.activeChat ?? null,
+      activeChatId: parsed.activeChatId ?? '',
+      currentChatMessages: parsed.currentChatMessages ?? [],
+      messagesByChatId: parsed.messagesByChatId ?? {},
+      isLoading: parsed.isLoading ?? false,
+      error: parsed.error ?? null,
+      lastFailedPrompt: parsed.lastFailedPrompt ?? null,
+    }
   } catch {
     return undefined
   }
