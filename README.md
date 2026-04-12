@@ -30,6 +30,12 @@ Run tests once (CI mode):
 npm test -- --run
 ```
 
+## Bundle Audit
+
+Bundle visualization from `vite-bundle-visualizer`:
+
+![Bundle visualization](./bundle-stats.png)
+
 ### Test Coverage
 
 **InputArea** (`src/components/chat/InputArea/`)

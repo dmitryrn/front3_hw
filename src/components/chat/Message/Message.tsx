@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import type { Message as ChatMessage } from '../../../types'
 import TypingIndicator from '../TypingIndicator/TypingIndicator'
 import { Avatar, Bubble, BubbleWrap, CopyButton, Markdown, Meta, Row } from '../styles'
+
+const MarkdownRenderer = lazy(() => import('./MarkdownRenderer'))
 
 type MessageProps = {
   message: ChatMessage
@@ -44,7 +45,13 @@ export default function Message({ message }: MessageProps) {
             </CopyButton>
           ) : null}
           <Markdown $variant={variant}>
-            {isPendingAssistantMessage ? <TypingIndicator isVisible /> : <ReactMarkdown>{message.content}</ReactMarkdown>}
+            {isPendingAssistantMessage ? (
+              <TypingIndicator isVisible />
+            ) : (
+              <Suspense fallback={message.content}>
+                <MarkdownRenderer content={message.content} />
+              </Suspense>
+            )}
           </Markdown>
         </Bubble>
       </BubbleWrap>
