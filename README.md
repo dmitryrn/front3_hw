@@ -34,7 +34,7 @@ npm test -- --run
 
 Bundle visualization from `vite-bundle-visualizer`:
 
-![Bundle visualization](./bundle-stats.png)
+![Bundle visualization](./docs/bundle-stats.png)
 
 ## Deploy
 
