@@ -1,4 +1,4 @@
-import type { ChangeEvent, KeyboardEvent, MouseEvent } from 'react'
+import { memo, type ChangeEvent, type KeyboardEvent, type MouseEvent } from 'react'
 import type { Chat } from '../../../types'
 import { ActionBtn, Actions, Content, EditInput, Item, Meta, Title } from '../styles'
 
@@ -7,12 +7,12 @@ type ChatItemProps = {
   active: boolean
   isEditing: boolean
   editingTitle: string
-  onSelect: () => void
-  onEdit: () => void
+  onSelectChat: (id: string) => void
+  onEditChat: (chat: Chat) => void
   onEditTitleChange: (value: string) => void
   onSaveEdit: () => void
   onCancelEdit: () => void
-  onDelete: () => void
+  onDeleteChat: (chat: Chat) => void
 }
 
 function formatDate(value: string) {
@@ -21,19 +21,20 @@ function formatDate(value: string) {
   return d.toLocaleDateString(undefined, { day: '2-digit', month: 'short' })
 }
 
-export default function ChatItem({
+function ChatItem({
   chat,
   active,
   isEditing,
   editingTitle,
-  onSelect,
-  onEdit,
+  onSelectChat,
+  onEditChat,
   onEditTitleChange,
   onSaveEdit,
   onCancelEdit,
-  onDelete,
+  onDeleteChat,
 }: ChatItemProps) {
   const onInputChange = (e: ChangeEvent<HTMLInputElement>) => onEditTitleChange(e.target.value)
+  const selectChat = () => onSelectChat(chat.id)
 
   const preventBlurBeforeClick = (e: MouseEvent<HTMLButtonElement>) => {
     if (!isEditing) return
@@ -58,11 +59,11 @@ export default function ChatItem({
       role="button"
       tabIndex={0}
       aria-current={active || undefined}
-      onClick={onSelect}
+      onClick={selectChat}
       onKeyDown={(e) => {
         if (e.key !== 'Enter' && e.key !== ' ') return
         e.preventDefault()
-        onSelect()
+        selectChat()
       }}
     >
       <Content>
@@ -92,7 +93,7 @@ export default function ChatItem({
               onSaveEdit()
               return
             }
-            onEdit()
+            onEditChat(chat)
           }}
           aria-label={isEditing ? 'Сохранить' : 'Редактировать'}
           title={isEditing ? 'Сохранить' : 'Редактировать'}
@@ -108,7 +109,7 @@ export default function ChatItem({
               onCancelEdit()
               return
             }
-            onDelete()
+            onDeleteChat(chat)
           }}
           aria-label={isEditing ? 'Отменить' : 'Удалить'}
           title={isEditing ? 'Отменить' : 'Удалить'}
@@ -119,3 +120,14 @@ export default function ChatItem({
     </Item>
   )
 }
+
+function areEqual(prevProps: ChatItemProps, nextProps: ChatItemProps) {
+  return (
+    prevProps.chat === nextProps.chat &&
+    prevProps.active === nextProps.active &&
+    prevProps.isEditing === nextProps.isEditing &&
+    prevProps.editingTitle === nextProps.editingTitle
+  )
+}
+
+export default memo(ChatItem, areEqual)

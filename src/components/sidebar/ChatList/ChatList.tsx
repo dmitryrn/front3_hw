@@ -36,12 +36,12 @@ export default function ChatList({
           active={c.id === activeChatId}
           isEditing={c.id === editingChatId}
           editingTitle={c.id === editingChatId ? editingTitle : ''}
-          onSelect={() => onSelectChat(c.id)}
-          onEdit={() => onStartEditChat(c)}
+          onSelectChat={onSelectChat}
+          onEditChat={onStartEditChat}
           onEditTitleChange={onEditTitleChange}
           onSaveEdit={onSaveEditChat}
           onCancelEdit={onCancelEditChat}
-          onDelete={() => onDeleteChat(c)}
+          onDeleteChat={onDeleteChat}
         />
       ))}
     </List>

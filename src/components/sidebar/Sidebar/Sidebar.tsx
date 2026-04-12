@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import type { Chat } from '../../../types'
 import Button from '../../ui/Button/Button'
 import SearchInput from '../SearchInput/SearchInput'
@@ -45,17 +45,17 @@ export default function Sidebar({
   const [editingTitle, setEditingTitle] = useState('')
   const [pendingDeleteChat, setPendingDeleteChat] = useState<Chat | null>(null)
 
-  const beginEditChat = (chat: Chat) => {
+  const beginEditChat = useCallback((chat: Chat) => {
     setEditingChatId(chat.id)
     setEditingTitle(chat.title)
-  }
+  }, [])
 
-  const cancelEditChat = () => {
+  const cancelEditChat = useCallback(() => {
     setEditingChatId(null)
     setEditingTitle('')
-  }
+  }, [])
 
-  const saveEditChat = () => {
+  const saveEditChat = useCallback(() => {
     if (!editingChatId) return
 
     const nextTitle = editingTitle.trim()
@@ -63,18 +63,26 @@ export default function Sidebar({
 
     onEditChat(editingChatId, nextTitle)
     cancelEditChat()
-  }
+  }, [cancelEditChat, editingChatId, editingTitle, onEditChat])
 
-  const requestDeleteChat = (chat: Chat) => {
+  const requestDeleteChat = useCallback((chat: Chat) => {
     cancelEditChat()
     setPendingDeleteChat(chat)
-  }
+  }, [cancelEditChat])
 
-  const confirmDeleteChat = () => {
+  const confirmDeleteChat = useCallback(() => {
     if (!pendingDeleteChat) return
     onDeleteChat(pendingDeleteChat.id)
     setPendingDeleteChat(null)
-  }
+  }, [onDeleteChat, pendingDeleteChat])
+
+  const handleSelectChat = useCallback(
+    (id: string) => {
+      onSelectChat(id)
+      onClose()
+    },
+    [onClose, onSelectChat],
+  )
 
   return (
     <>
@@ -96,10 +104,7 @@ export default function Sidebar({
           activeChatId={activeChatId}
           editingChatId={editingChatId}
           editingTitle={editingChatId ? editingTitle : ''}
-          onSelectChat={(id) => {
-            onSelectChat(id)
-            onClose()
-          }}
+          onSelectChat={handleSelectChat}
           onStartEditChat={beginEditChat}
           onEditTitleChange={setEditingTitle}
           onSaveEditChat={saveEditChat}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes, useMatch, useNavigate } from 'react-router-dom'
 import type { ChatSettings, Theme } from './types'
 import AuthForm from './components/auth/AuthForm/AuthForm'
@@ -66,17 +66,17 @@ export default function App() {
   const routedMessages = routeChatId ? messagesByChatId[routeChatId] ?? [] : []
   const sidebarActiveChatId = routeChatId ?? activeChatId
 
-  const openSidebar = () => setIsSidebarOpen(true)
-  const closeSidebar = () => setIsSidebarOpen(false)
-  const openSettings = () => setIsSettingsOpen(true)
-  const closeSettings = () => setIsSettingsOpen(false)
+  const openSidebar = useCallback(() => setIsSidebarOpen(true), [])
+  const closeSidebar = useCallback(() => setIsSidebarOpen(false), [])
+  const openSettings = useCallback(() => setIsSettingsOpen(true), [])
+  const closeSettings = useCallback(() => setIsSettingsOpen(false), [])
 
-  const onApiKeyChange = (value: string) => {
+  const onApiKeyChange = useCallback((value: string) => {
     setApiKey(value)
     if (authError) setAuthError(null)
-  }
+  }, [authError])
 
-  const onAuthSubmit = () => {
+  const onAuthSubmit = useCallback(() => {
     if (!apiKey.trim()) {
       setAuthError('Поле OpenAI API Key не должно быть пустым')
       return
@@ -84,31 +84,36 @@ export default function App() {
 
     setAuthError(null)
     setIsAuthed(true)
-  }
+  }, [apiKey])
 
-  const onNewChat = () => {
+  const onNewChat = useCallback(() => {
     const action = dispatch(createChat())
     navigate(`/chat/${action.payload.id}`)
-  }
+  }, [dispatch, navigate])
 
-  const onEditChat = (chatId: string, title: string) => dispatch(editChatTitle({ chatId, title }))
+  const onEditChat = useCallback(
+    (chatId: string, title: string) => dispatch(editChatTitle({ chatId, title })),
+    [dispatch],
+  )
 
-  const onDeleteChat = (chatId: string) => {
+  const onDeleteChat = useCallback((chatId: string) => {
     dispatch(deleteChat(chatId))
 
     if (routeChatId === chatId) {
       navigate('/')
     }
-  }
+  }, [dispatch, navigate, routeChatId])
 
-  const onSendMessage = (text: string) => {
+  const onSendMessage = useCallback((text: string) => {
     void dispatch(sendMessage({ text, apiKey, settings }))
-  }
+  }, [apiKey, dispatch, settings])
 
-  const onResetSettings = () => {
+  const onResetSettings = useCallback(() => {
     setSettings(DEFAULT_SETTINGS)
     setTheme('light')
-  }
+  }, [])
+
+  const handleSelectChat = useCallback((chatId: string) => navigate(`/chat/${chatId}`), [navigate])
 
   if (!isAuthed) {
     return (
@@ -128,7 +133,7 @@ export default function App() {
             chats={visibleChats}
             activeChatId={sidebarActiveChatId}
             onNewChat={onNewChat}
-            onSelectChat={(chatId) => navigate(`/chat/${chatId}`)}
+            onSelectChat={handleSelectChat}
             onEditChat={onEditChat}
             onDeleteChat={onDeleteChat}
           />
