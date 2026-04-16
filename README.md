@@ -1,4 +1,4 @@
-# Mock Chat UI (React)
+# Chat UI App
 
 Статическое чат-приложение, собранное на React + TypeScript + Vite.
 
