@@ -42,6 +42,8 @@ function ChatItem({
   }
 
   const onInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    e.stopPropagation()
+
     if (e.key === 'Enter') {
       e.preventDefault()
       onSaveEdit()
@@ -60,11 +62,6 @@ function ChatItem({
       tabIndex={0}
       aria-current={active || undefined}
       onClick={selectChat}
-      onKeyDown={(e) => {
-        if (e.key !== 'Enter' && e.key !== ' ') return
-        e.preventDefault()
-        selectChat()
-      }}
     >
       <Content>
         {isEditing ? (
