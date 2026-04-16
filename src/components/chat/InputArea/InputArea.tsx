@@ -60,10 +60,6 @@ export default function InputArea({ isLoading = false, onSend, onStop }: InputAr
         />
 
         <Buttons>
-          <Button type="button" variant="ghost" iconOnly aria-label="Прикрепить">
-            ⊕
-          </Button>
-
           {isLoading ? (
             <Button type="button" variant="ghost" iconOnly aria-label="Стоп" onClick={onStop}>
               ■

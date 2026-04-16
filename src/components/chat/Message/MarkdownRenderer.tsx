@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown'
+import remarkBreaks from 'remark-breaks'
 import { Highlight, themes } from 'prism-react-renderer'
 
 type MarkdownRendererProps = {
@@ -8,6 +9,7 @@ type MarkdownRendererProps = {
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkBreaks]}
       components={{
         code({ className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '')
