@@ -101,12 +101,13 @@ export function createChatSlice(initialState: ChatState) {
 
         state.chats.unshift(newChat)
         state.messagesByChatId[newId] = []
-        state.activeChat = newChat
-        state.activeChatId = newId
-         state.currentChatMessages = []
-         state.error = null
-         state.lastFailedPrompt = null
-       },
+         state.activeChat = newChat
+         state.activeChatId = newId
+          state.currentChatMessages = []
+          state.isLoading = false
+          state.error = null
+          state.lastFailedPrompt = null
+        },
       prepare() {
         return { payload: { id: id('chat') } }
       },
@@ -115,6 +116,7 @@ export function createChatSlice(initialState: ChatState) {
       state.activeChatId = action.payload
       state.activeChat = getActiveChat(state.chats, action.payload)
       state.currentChatMessages = getCurrentChatMessages(state.messagesByChatId, action.payload)
+      state.isLoading = false
       state.error = null
       state.lastFailedPrompt = null
     },
@@ -131,11 +133,7 @@ export function createChatSlice(initialState: ChatState) {
       state.activeChatId = nextActiveChatId
       state.activeChat = getActiveChat(state.chats, nextActiveChatId)
       state.currentChatMessages = getCurrentChatMessages(state.messagesByChatId, nextActiveChatId)
-
-      if (deletedActiveChat) {
-        state.isLoading = false
-      }
-
+      state.isLoading = false
       state.error = null
       state.lastFailedPrompt = null
     },
@@ -199,7 +197,16 @@ export function createChatSlice(initialState: ChatState) {
       state.error = error
       state.lastFailedPrompt = failedText
     },
-    sendMessageCancelled(state) {
+    sendMessageCancelled(state, action: PayloadAction<{ chatId: string; messageId: string }>) {
+      const { chatId, messageId } = action.payload
+      const currentMessages = state.messagesByChatId[chatId] ?? []
+      const cancelledMessage = currentMessages.find((message) => message.id === messageId)
+
+      // Keep partial messages, drop empty assistant placeholders
+      state.messagesByChatId[chatId] = cancelledMessage?.content
+        ? currentMessages
+        : currentMessages.filter((message) => message.id !== messageId)
+      state.currentChatMessages = getCurrentChatMessages(state.messagesByChatId, state.activeChatId)
       state.isLoading = false
       state.error = null
     },
@@ -292,7 +299,12 @@ export const sendMessage =
       )
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        dispatch(sendMessageCancelled())
+        dispatch(
+          sendMessageCancelled({
+            chatId: activeChatId,
+            messageId: assistantMessage.id,
+          }),
+        )
         return
       }
       console.error('Failed to send message', error)

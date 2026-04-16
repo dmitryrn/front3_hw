@@ -4,11 +4,13 @@ import chatReducer, {
   createChat,
   deleteChat,
   editChatTitle,
+  selectChat,
   sendMessageCancelled,
   sendMessageFailed,
   sendMessageSucceeded,
 } from './chatSlice'
 import { loadChatState, saveChatState } from './persistence'
+import { streamControl } from './streamControl'
 
 const persistedChatState = loadChatState()
 
@@ -20,6 +22,22 @@ const persistActions = new Set<string>([
   sendMessageFailed.type,
   sendMessageCancelled.type,
 ])
+
+const stopGenerationActions = new Set<string>([
+  createChat.type,
+  selectChat.type,
+  deleteChat.type,
+])
+
+const streamControlMiddleware: Middleware = () => (next) => (action) => {
+  if (typeof action === 'object' && action !== null && 'type' in action) {
+    const type = (action as { type: string }).type
+    if (stopGenerationActions.has(type)) {
+      streamControl.stop()
+    }
+  }
+  return next(action)
+}
 
 const persistenceMiddleware: Middleware = (api) => (next) => (action) => {
   const result = next(action)
@@ -34,7 +52,7 @@ export const store = configureStore({
     chat: chatReducer,
   },
   preloadedState: persistedChatState ? { chat: persistedChatState } : undefined,
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(persistenceMiddleware),
+  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(streamControlMiddleware, persistenceMiddleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>

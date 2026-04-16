@@ -5,6 +5,7 @@ import {
   createChatSlice,
   deleteChat,
   editChatTitle,
+  selectChat,
   sendMessageCancelled,
   sendMessageFailed,
   sendMessageStarted,
@@ -92,6 +93,18 @@ describe('chatSlice reducer', () => {
     })
   })
 
+  it('createChat resets isLoading', () => {
+    const initialState = makeState({ isLoading: true })
+    const reducer = makeReducer(initialState)
+
+    const nextState = reducer(undefined, {
+      type: createChat.type,
+      payload: { id: 'chat-3' },
+    })
+
+    expect(nextState.isLoading).toBe(false)
+  })
+
   it('deleteChat removes the active chat and switches to the next available chat', () => {
     const initialState = makeState({ isLoading: true, error: 'old error' })
     const reducer = makeReducer(initialState)
@@ -140,6 +153,26 @@ describe('chatSlice reducer', () => {
       isLoading: false,
       lastFailedPrompt: null,
     })
+  })
+
+  it('selectChat switches active chat and resets isLoading', () => {
+    const initialState = makeState({ isLoading: true })
+    const reducer = makeReducer(initialState)
+
+    const nextState = reducer(undefined, selectChat('chat-2'))
+
+    expect(nextState.activeChatId).toBe('chat-2')
+    expect(nextState.currentChatMessages).toEqual(initialState.messagesByChatId['chat-2'])
+    expect(nextState.isLoading).toBe(false)
+  })
+
+  it('deleteChat resets isLoading even when deleting a non-active chat', () => {
+    const initialState = makeState({ activeChatId: 'chat-2', isLoading: true })
+    const reducer = makeReducer(initialState)
+
+    const nextState = reducer(undefined, deleteChat('chat-1'))
+
+    expect(nextState.isLoading).toBe(false)
   })
 
   it('editChatTitle updates the matching chat and activeChat title', () => {
@@ -288,6 +321,36 @@ describe('chatSlice reducer', () => {
     })
   })
 
+  it('sendMessageCancelled removes empty assistant placeholder and clears loading state', () => {
+    const assistantMessage = makeMessage('msg-assistant', 'assistant', '', '2026-04-05T12:00:01.000Z')
+    const initialState = makeState({
+      chats: [makeChat('chat-1', 'Первый чат')],
+      activeChat: makeChat('chat-1', 'Первый чат'),
+      activeChatId: 'chat-1',
+      currentChatMessages: [makeMessage('msg-user', 'user', 'Привет'), assistantMessage],
+      messagesByChatId: {
+        'chat-1': [makeMessage('msg-user', 'user', 'Привет'), assistantMessage],
+      },
+      isLoading: true,
+    })
+    const reducer = makeReducer(initialState)
+
+    const nextState = reducer(
+      undefined,
+      sendMessageCancelled({ chatId: 'chat-1', messageId: 'msg-assistant' }),
+    )
+
+    expect(nextState).toEqual({
+      ...initialState,
+      currentChatMessages: [initialState.currentChatMessages[0]!],
+      messagesByChatId: {
+        'chat-1': [initialState.messagesByChatId['chat-1'][0]!],
+      },
+      isLoading: false,
+      error: null,
+    })
+  })
+
   it('sendMessageCancelled keeps partial assistant message and clears loading state', () => {
     const assistantMessage = makeMessage('msg-assistant', 'assistant', 'partial...', '2026-04-05T12:00:01.000Z')
     const initialState = makeState({
@@ -302,7 +365,10 @@ describe('chatSlice reducer', () => {
     })
     const reducer = makeReducer(initialState)
 
-    const nextState = reducer(undefined, sendMessageCancelled())
+    const nextState = reducer(
+      undefined,
+      sendMessageCancelled({ chatId: 'chat-1', messageId: 'msg-assistant' }),
+    )
 
     expect(nextState).toEqual({
       ...initialState,
