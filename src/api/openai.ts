@@ -5,7 +5,11 @@ export type OpenAIMessage = {
 
 export type OpenAIChatRequest = {
   model: string
+  temperature: number
+  topP: number
   maxTokens: number
+  frequencyPenalty: number
+  presencePenalty: number
   messages: OpenAIMessage[]
 }
 

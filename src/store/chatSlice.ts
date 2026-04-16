@@ -272,7 +272,11 @@ export const sendMessage =
       await streamOpenAIChat(
         {
           model: settings.model,
+          temperature: settings.temperature,
+          topP: settings.topP,
           maxTokens: settings.maxTokens,
+          frequencyPenalty: settings.frequencyPenalty,
+          presencePenalty: settings.presencePenalty,
           messages: buildRequestMessages(settings, history, userMessage),
         },
         {

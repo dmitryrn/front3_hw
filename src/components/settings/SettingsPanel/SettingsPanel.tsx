@@ -70,6 +70,24 @@ export default function SettingsPanel({
             onChange={(v) => onChangeSettings({ ...settings, topP: v })}
           />
 
+          <Slider
+            label="Frequency Penalty"
+            value={settings.frequencyPenalty}
+            min={-2}
+            max={2}
+            step={0.01}
+            onChange={(v) => onChangeSettings({ ...settings, frequencyPenalty: v })}
+          />
+
+          <Slider
+            label="Presence Penalty"
+            value={settings.presencePenalty}
+            min={-2}
+            max={2}
+            step={0.01}
+            onChange={(v) => onChangeSettings({ ...settings, presencePenalty: v })}
+          />
+
           <Row>
             <FieldLabel htmlFor="maxTokens">
               Max Tokens

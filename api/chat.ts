@@ -18,7 +18,27 @@ export default async function handler(req: any, res: any) {
   }
 
   try {
-    const { model, maxTokens, messages } = req.body ?? {}
+    const { model, temperature, topP, maxTokens, frequencyPenalty, presencePenalty, messages } = req.body ?? {}
+
+    const isReasoningModel =
+      model?.startsWith('gpt-5') ||
+      /\bo1\b/.test(model) ||
+      /\bo3\b/.test(model) ||
+      /\bo4\b/.test(model)
+
+    const body: Record<string, unknown> = {
+      model,
+      messages,
+      max_completion_tokens: maxTokens,
+      stream: true,
+    }
+
+    if (!isReasoningModel) {
+      body.temperature = temperature
+      body.top_p = topP
+      body.frequency_penalty = frequencyPenalty
+      body.presence_penalty = presencePenalty
+    }
 
     const response = await fetch(OPENAI_API_URL, {
       method: 'POST',
@@ -26,12 +46,7 @@ export default async function handler(req: any, res: any) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model,
-        messages,
-        max_completion_tokens: maxTokens,
-        stream: true,
-      }),
+      body: JSON.stringify(body),
     })
 
     if (!response.ok) {
