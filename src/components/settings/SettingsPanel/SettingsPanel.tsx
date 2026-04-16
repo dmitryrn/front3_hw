@@ -9,6 +9,7 @@ type SettingsPanelProps = {
   isOpen: boolean
   settings: ChatSettings
   theme: Theme
+  models: string[]
   onClose: () => void
   onChangeSettings: (next: ChatSettings) => void
   onChangeTheme: (next: Theme) => void
@@ -20,6 +21,7 @@ export default function SettingsPanel({
   isOpen,
   settings,
   theme,
+  models,
   onClose,
   onChangeSettings,
   onChangeTheme,
@@ -48,7 +50,9 @@ export default function SettingsPanel({
               value={settings.model}
               onChange={(e) => onChangeSettings({ ...settings, model: e.target.value as ChatSettings['model'] })}
             >
-              <option value="gpt-5-mini">gpt-5-mini</option>
+              {models.map((model) => (
+                <option key={model} value={model}>{model}</option>
+              ))}
             </Select>
           </Row>
 

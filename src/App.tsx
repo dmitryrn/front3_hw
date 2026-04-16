@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useMatch, useNavigate } from 'react-router-dom
 import type { ChatSettings, Theme } from './types'
 import AppLayout from './components/layout/AppLayout/AppLayout'
 import { DEFAULT_SETTINGS } from './settings'
+import { fetchModels } from './api/models'
 import {
   createChat,
   deleteChat,
@@ -44,6 +45,7 @@ export default function App() {
   const [theme, setTheme] = useState<Theme>('light')
   const [settings, setSettings] = useState<ChatSettings>(DEFAULT_SETTINGS)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [models, setModels] = useState<string[]>(['gpt-5-mini'])
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const [searchValue, setSearchValue] = useState('')
@@ -63,6 +65,14 @@ export default function App() {
     if (!routeChatId) return
     dispatch(selectChatAction(routeChatId))
   }, [dispatch, routeChatId])
+
+  useEffect(() => {
+    fetchModels()
+      .then((fetched) => setModels(fetched))
+      .catch(() => {
+        // keep fallback default
+      })
+  }, [])
 
   const visibleChats = useMemo(() => {
     const q = searchValue.trim().toLowerCase()
@@ -172,6 +182,7 @@ export default function App() {
             isOpen={isSettingsOpen}
             settings={settings}
             theme={theme}
+            models={models}
             onClose={closeSettings}
             onChangeSettings={setSettings}
             onChangeTheme={setTheme}

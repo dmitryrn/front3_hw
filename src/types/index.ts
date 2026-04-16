@@ -40,7 +40,7 @@ export type ChatAction =
   | { type: 'chat/sendMessageFailed'; payload: { chatId: string; messageId: string; error: string; failedText: string } }
   | { type: 'chat/clearError' }
 
-export type ModelId = 'gpt-5-mini'
+export type ModelId = string
 
 export type ChatSettings = {
   model: ModelId

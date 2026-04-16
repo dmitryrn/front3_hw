@@ -13,7 +13,6 @@ function id(prefix: string) {
   return `${prefix}_${Math.random().toString(16).slice(2, 10)}`
 }
 
-const ASSISTANT_AUTHOR = 'gpt-5-mini'
 const DEFAULT_CHAT_TITLE = 'Новый чат'
 const FALLBACK_CHAT_PREFIX = 'Диалог'
 const MIN_GENERATED_TITLE_LENGTH = 3
@@ -257,7 +256,7 @@ export const sendMessage =
     const assistantMessage: Message = {
       id: id('msg'),
       role: 'assistant',
-      author: ASSISTANT_AUTHOR,
+      author: settings.model,
       content: '',
       createdAt: nowIso(),
     }
