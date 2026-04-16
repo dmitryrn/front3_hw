@@ -17,6 +17,7 @@ type ChatWindowProps = {
   onOpenSettings: () => void
   onSendMessage: (text: string) => void
   onRetryMessage: () => void
+  onStopGeneration?: () => void
 }
 
 export default function ChatWindow({
@@ -29,6 +30,7 @@ export default function ChatWindow({
   onOpenSettings,
   onSendMessage,
   onRetryMessage,
+  onStopGeneration,
 }: ChatWindowProps) {
   const hasMessages = messages.length > 0
 
@@ -57,7 +59,7 @@ export default function ChatWindow({
         {hasMessages ? <MessageList messages={messages} /> : <EmptyState />}
       </ErrorBoundary>
 
-      <InputArea isLoading={isLoading} onSend={onSendMessage} />
+      <InputArea isLoading={isLoading} onSend={onSendMessage} onStop={onStopGeneration} />
 
       {error ? (
         <InputError>

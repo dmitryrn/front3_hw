@@ -5,6 +5,7 @@ import {
   createChatSlice,
   deleteChat,
   editChatTitle,
+  sendMessageCancelled,
   sendMessageFailed,
   sendMessageStarted,
   sendMessageSucceeded,
@@ -284,6 +285,29 @@ describe('chatSlice reducer', () => {
       isLoading: false,
       error: 'Network error',
       lastFailedPrompt: 'Привет',
+    })
+  })
+
+  it('sendMessageCancelled keeps partial assistant message and clears loading state', () => {
+    const assistantMessage = makeMessage('msg-assistant', 'assistant', 'partial...', '2026-04-05T12:00:01.000Z')
+    const initialState = makeState({
+      chats: [makeChat('chat-1', 'Первый чат')],
+      activeChat: makeChat('chat-1', 'Первый чат'),
+      activeChatId: 'chat-1',
+      currentChatMessages: [makeMessage('msg-user', 'user', 'Привет'), assistantMessage],
+      messagesByChatId: {
+        'chat-1': [makeMessage('msg-user', 'user', 'Привет'), assistantMessage],
+      },
+      isLoading: true,
+    })
+    const reducer = makeReducer(initialState)
+
+    const nextState = reducer(undefined, sendMessageCancelled())
+
+    expect(nextState).toEqual({
+      ...initialState,
+      isLoading: false,
+      error: null,
     })
   })
 })

@@ -6,6 +6,7 @@ import { Buttons, Composer, InputWrap, Textarea } from '../styles'
 type InputAreaProps = {
   isLoading?: boolean
   onSend: (text: string) => void
+  onStop?: () => void
 }
 
 function getMaxHeight(textarea: HTMLTextAreaElement) {
@@ -26,7 +27,7 @@ function useAutosize(ref: RefObject<HTMLTextAreaElement | null>, value: string) 
   }, [ref, value])
 }
 
-export default function InputArea({ isLoading = false, onSend }: InputAreaProps) {
+export default function InputArea({ isLoading = false, onSend, onStop }: InputAreaProps) {
   const [value, setValue] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement | null>(null)
 
@@ -64,7 +65,7 @@ export default function InputArea({ isLoading = false, onSend }: InputAreaProps)
           </Button>
 
           {isLoading ? (
-            <Button type="button" variant="ghost" disabled iconOnly aria-label="Стоп">
+            <Button type="button" variant="ghost" iconOnly aria-label="Стоп" onClick={onStop}>
               ■
             </Button>
           ) : (

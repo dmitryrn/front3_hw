@@ -15,6 +15,7 @@ import {
   selectChat as selectChatAction,
   editChatTitle,
   sendMessage,
+  stopGeneration,
 } from './store/chatSlice'
 import { useAppDispatch, useAppSelector } from './store/hooks'
 
@@ -103,6 +104,10 @@ export default function App() {
     void dispatch(sendMessage({ text, settings }))
   }, [dispatch, settings])
 
+  const onStopGeneration = useCallback(() => {
+    dispatch(stopGeneration())
+  }, [dispatch])
+
   const onRetryMessage = useCallback(() => {
     if (!lastFailedPrompt) return
     void dispatch(sendMessage({ text: lastFailedPrompt, settings }))
@@ -151,6 +156,7 @@ export default function App() {
                       onOpenSettings={openSettings}
                       onSendMessage={onSendMessage}
                       onRetryMessage={onRetryMessage}
+                      onStopGeneration={onStopGeneration}
                     />
                   }
                 />

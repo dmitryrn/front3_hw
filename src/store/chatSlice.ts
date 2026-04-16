@@ -3,6 +3,8 @@ import { streamOpenAIChat } from '../api/openai'
 import type { AppDispatch, RootState } from './index'
 import type { Chat, ChatAction, ChatSettings, ChatState, Message } from '../types'
 
+import { streamControl } from './streamControl'
+
 function nowIso() {
   return new Date().toISOString()
 }
@@ -197,6 +199,10 @@ export function createChatSlice(initialState: ChatState) {
       state.error = error
       state.lastFailedPrompt = failedText
     },
+    sendMessageCancelled(state) {
+      state.isLoading = false
+      state.error = null
+    },
     clearError(state) {
       state.error = null
       state.lastFailedPrompt = null
@@ -213,11 +219,16 @@ export const {
   deleteChat,
   editChatTitle,
   selectChat,
+  sendMessageCancelled,
   sendMessageFailed,
   sendMessageStarted,
   sendMessageSucceeded,
   updateAssistantMessage,
 } = chatSlice.actions
+
+export const stopGeneration = () => () => {
+  streamControl.stop()
+}
 
 export const sendMessage =
   ({ text, settings }: { text: string; settings: ChatSettings }) =>
@@ -246,6 +257,8 @@ export const sendMessage =
 
     dispatch(sendMessageStarted({ chatId: activeChatId, userMessage, assistantMessage }))
 
+    const controller = streamControl.start()
+
     try {
       let assistantContent = ''
 
@@ -267,6 +280,7 @@ export const sendMessage =
             )
           },
         },
+        controller.signal,
       )
 
       dispatch(
@@ -277,6 +291,10 @@ export const sendMessage =
         }),
       )
     } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        dispatch(sendMessageCancelled())
+        return
+      }
       console.error('Failed to send message', error)
       dispatch(
         sendMessageFailed({
@@ -286,6 +304,8 @@ export const sendMessage =
           failedText: text,
         }),
       )
+    } finally {
+      streamControl.clear()
     }
   }
 

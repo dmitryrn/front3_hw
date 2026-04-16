@@ -10,15 +10,17 @@ export function loadChatState(): ChatState | undefined {
 
   try {
     const parsed = JSON.parse(raw) as Partial<ChatState>
+    const activeChatId = parsed.activeChatId ?? ''
+    const messagesByChatId = parsed.messagesByChatId ?? {}
     return {
       chats: parsed.chats ?? [],
       activeChat: parsed.activeChat ?? null,
-      activeChatId: parsed.activeChatId ?? '',
-      currentChatMessages: parsed.currentChatMessages ?? [],
-      messagesByChatId: parsed.messagesByChatId ?? {},
-      isLoading: parsed.isLoading ?? false,
-      error: parsed.error ?? null,
-      lastFailedPrompt: parsed.lastFailedPrompt ?? null,
+      activeChatId,
+      currentChatMessages: messagesByChatId[activeChatId] ?? [],
+      messagesByChatId,
+      isLoading: false,
+      error: null,
+      lastFailedPrompt: null,
     }
   } catch {
     return undefined
@@ -27,5 +29,11 @@ export function loadChatState(): ChatState | undefined {
 
 export function saveChatState(state: ChatState) {
   if (typeof window === 'undefined') return
-  window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(state))
+  const toSave = {
+    chats: state.chats,
+    activeChat: state.activeChat,
+    activeChatId: state.activeChatId,
+    messagesByChatId: state.messagesByChatId,
+  }
+  window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(toSave))
 }

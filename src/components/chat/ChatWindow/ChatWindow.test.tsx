@@ -22,6 +22,7 @@ describe('ChatWindow', () => {
         onOpenSettings={vi.fn()}
         onSendMessage={vi.fn()}
         onRetryMessage={onRetryMessage}
+        onStopGeneration={vi.fn()}
       />,
     )
 
@@ -42,6 +43,7 @@ describe('ChatWindow', () => {
         onOpenSettings={vi.fn()}
         onSendMessage={vi.fn()}
         onRetryMessage={vi.fn()}
+        onStopGeneration={vi.fn()}
       />,
     )
 

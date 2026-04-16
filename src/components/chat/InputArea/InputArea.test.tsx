@@ -72,16 +72,21 @@ describe('InputArea', () => {
     expect(textarea.value).toBe('')
   })
 
-  it('shows disabled stop button and prevents sending while loading', async () => {
+  it('shows enabled stop button and prevents sending while loading', async () => {
     const user = userEvent.setup()
     const onSend = vi.fn()
+    const onStop = vi.fn()
 
-    render(<InputArea onSend={onSend} isLoading />)
+    render(<InputArea onSend={onSend} isLoading onStop={onStop} />)
 
     await user.type(screen.getByPlaceholderText('Напишите сообщение...'), 'message{enter}')
 
-    expect(screen.getByRole('button', { name: 'Стоп' })).toBeDisabled()
+    const stopButton = screen.getByRole('button', { name: 'Стоп' })
+    expect(stopButton).toBeEnabled()
     expect(screen.queryByRole('button', { name: 'Отправить' })).not.toBeInTheDocument()
     expect(onSend).not.toHaveBeenCalled()
+
+    await user.click(stopButton)
+    expect(onStop).toHaveBeenCalledTimes(1)
   })
 })

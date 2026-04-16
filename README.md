@@ -51,13 +51,7 @@ cp .env.example .env.local
 OPENAI_API_KEY=your_server_side_key
 ```
 
-5. Запустите frontend dev server:
-
-```bash
-npm run dev
-```
-
-6. Для полной локальной работы вместе с Vercel server function запустите:
+5. Запустите:
 
 ```bash
 npx vercel dev

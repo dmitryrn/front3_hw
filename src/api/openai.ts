@@ -45,13 +45,14 @@ function processSseEvent(event: string, onChunk: (chunk: string) => void) {
   }
 }
 
-export async function streamOpenAIChat(request: OpenAIChatRequest, handlers: StreamHandlers) {
+export async function streamOpenAIChat(request: OpenAIChatRequest, handlers: StreamHandlers, signal?: AbortSignal) {
   const response = await fetch('/api/chat', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(request),
+    signal,
   })
 
   if (!response.ok) {

@@ -12,6 +12,7 @@ type ChatRouteProps = {
   onOpenSettings: () => void
   onSendMessage: (text: string) => void
   onRetryMessage: () => void
+  onStopGeneration: () => void
 }
 
 export default function ChatRoute({
@@ -24,6 +25,7 @@ export default function ChatRoute({
   onOpenSettings,
   onSendMessage,
   onRetryMessage,
+  onStopGeneration,
 }: ChatRouteProps) {
   if (!chat) {
     return <EmptyState title="Чат не найден" text="Проверьте адрес или выберите другой чат в боковой панели." />
@@ -40,6 +42,7 @@ export default function ChatRoute({
       onOpenSettings={onOpenSettings}
       onSendMessage={onSendMessage}
       onRetryMessage={onRetryMessage}
+      onStopGeneration={onStopGeneration}
     />
   )
 }
